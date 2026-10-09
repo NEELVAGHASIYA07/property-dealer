@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Fieldhouse Real Estate Platform (Next.js + AdonisJS + MySQL)
 
-## Getting Started
+આ પ્રોજેક્ટ હવે પૂર્ણ-સ્ટેક (Full-Stack) આર્કિટેક્ચર સાથે સેટ થઈ ગયો છે:
+- **Frontend**: Next.js 16 (React 19) port `3000` પર ચાલે છે.
+- **Backend API**: AdonisJS v6 (Node.js framework) port `3333` પર ચાલે છે.
+- **SQL Database**: MySQL (Lucid ORM) સાથે `property_dealer` ડેટાબેઝમાં કનેક્ટેડ છે.
 
-First, run the development server:
+---
 
+## 🚀 Quick Start (કેવી રીતે રન કરવું)
+
+### 1. બન્ને સર્વર એક સાથે રન કરવા (Frontend + Backend):
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run dev:all
 ```
+આ કમાન્ડ `concurrently` નો ઉપયોગ કરીને Next.js (`http://localhost:3000`) અને AdonisJS API (`http://localhost:3333`) બન્ને સાથે ચલાવશે.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. વ્યક્તિગત કમાન્ડ્સ:
+- **ફક્ત Frontend ચલાવવા**:
+  ```bash
+  npm run dev
+  ```
+- **ફક્ત AdonisJS Backend ચલાવવા**:
+  ```bash
+  npm run backend
+  ```
+- **Database Migrations રન કરવા**:
+  ```bash
+  npm run backend:migrate
+  ```
+- **Database Seed કરવા (Properties & Cities Data)**:
+  ```bash
+  npm run backend:seed
+  ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📡 REST API Endpoints (AdonisJS - `http://localhost:3333`)
 
-## Learn More
+| Method | Endpoint | વર્ણન (Description) |
+|---|---|---|
+| `GET` | `/` | API status અને endpoints સૂચિ |
+| `GET` | `/api/properties` | બધી પ્રોપર્ટીઝ લિસ્ટ (Filter by `mode`, `city`, `type`, `bedrooms`, `priceMin`, `priceMax`, `search`, `trending`) |
+| `GET` | `/api/properties/:id` | ચોક્કસ પ્રોપર્ટી ની વિગતો |
+| `POST` | `/api/properties` | નવી પ્રોપર્ટી ઉમેરવા |
+| `DELETE` | `/api/properties/:id` | પ્રોપર્ટી ડિલીટ કરવા |
+| `GET` | `/api/trending` | હોમપેજ માટે ટ્રેન્ડિંગ પ્રોપર્ટીઝ |
+| `GET` | `/api/cities` | ગુજરાતના શહેરો અને પ્રોપર્ટી કાઉન્ટ |
+| `POST` | `/api/v1/auth/signup` | નવું એકાઉન્ટ રજીસ્ટર કરવા |
+| `POST` | `/api/v1/auth/login` | યુઝર લોગિન અને એક્સેસ ટોકન |
+| `GET` | `/api/v1/account/profile` | ઓથેન્ટિકેટેડ પ્રોફાઇલ (Bearer token) |
 
-To learn more about Next.js, take a look at the following resources:
+### API Filter Examples:
+- **Rent Properties**: `GET http://localhost:3333/api/properties?mode=rent`
+- **Buy Properties in Ahmedabad**: `GET http://localhost:3333/api/properties?mode=buy&city=Ahmedabad`
+- **3+ BHK Villas**: `GET http://localhost:3333/api/properties?type=Villa&bedrooms=3`
+- **Price Filter**: `GET http://localhost:3333/api/properties?priceMin=5000000&priceMax=20000000`
+- **Search**: `GET http://localhost:3333/api/properties?search=penthouse`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🗄️ SQL Database & Lucid ORM
 
-## Deploy on Vercel
+- **Database**: MySQL (Database Name: `property_dealer`, Port: `3306`)
+- **Models**:
+  - `backend/app/models/property.ts` (id, name, city, location, mode, type, price, priceLabel, size, bedrooms, bathrooms, details, image, tag, isTrending, description)
+  - `backend/app/models/city.ts` (id, name, propertiesCount, image)
+  - `backend/app/models/user.ts` (id, fullName, email, password)
+- **Migrations**:
+  - `backend/database/migrations/*_create_properties_table.ts`
+  - `backend/database/migrations/*_create_cities_table.ts`
+  - `backend/database/migrations/*_create_users_table.ts`
+  - `backend/database/migrations/*_create_access_tokens_table.ts`
+- **Seeder**:
+  - `backend/database/seeders/property_seeder.ts` (22+ વાસ્તવિક પ્રોપર્ટીઝ અને 12 ગુજરાત શહેરો)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🖥️ Frontend Integration (`app/lib/api.js`)
+
+ફ્રન્ટએન્ડ આપોઆપ બેકએન્ડ API સાથે જોડાયેલું છે:
+- હોમપેજ (`/`) ટ્રેન્ડિંગ પ્રોપર્ટીઝ અને સિટીઝ SQLite માંથી લોડ કરે છે.
+- Buy પેજ (`/buy`), Rent પેજ (`/rent`), Short-Term પેજ (`/short-term`) ડાયરેક્ટ SQLite ડેટા સાથે ફિલ્ટરિંગ કરે છે.
+- જો ક્યારેક બેકએન્ડ સર્વર બંધ હોય, તો પણ ફ્રન્ટએન્ડ ગ્રેસફુલ ફોલબેક (graceful fallback) સાથે કામ કરતું રહેશે!

@@ -1,0 +1,1663 @@
+/* Property Listing Split-Screen Layout & Map Styles */
+
+.property-listing-page {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 82px);
+  background: var(--background, #f4f1eb);
+  color: var(--foreground, #1d1e1a);
+}
+
+/* ==========================================================================
+   TOP FILTER BAR
+   ========================================================================== */
+.listing-filter-bar {
+  background: #ffffff;
+  border-bottom: 1px solid rgba(29, 30, 26, 0.1);
+  padding: 16px clamp(16px, 3vw, 40px);
+  position: sticky;
+  top: 82px;
+  z-index: 40;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.listing-filter-top-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.listing-search-input-wrap {
+  position: relative;
+  flex: 1 1 260px;
+  min-width: 240px;
+}
+
+.listing-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #77766f;
+  pointer-events: none;
+}
+
+.listing-search-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 16px 0 42px;
+  border-radius: 10px;
+  border: 1.5px solid #e2ded5;
+  background: #fbfaf7;
+  font-size: 14px;
+  color: #1d1e1a;
+  transition: all 0.2s ease;
+}
+
+.listing-search-input:focus {
+  outline: none;
+  border-color: #ee705b;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(238, 112, 91, 0.12);
+}
+
+.listing-filter-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.listing-select-wrap-price,
+.price-select-wrap {
+  width: 150px !important;
+  min-width: 150px !important;
+  max-width: 150px !important;
+  flex: 0 0 150px !important;
+}
+
+.listing-select-wrap {
+  position: relative;
+  min-width: 130px;
+}
+
+.listing-select-wrap.price-select-wrap {
+  width: 150px !important;
+  min-width: 150px !important;
+  max-width: 150px !important;
+  flex: 0 0 150px !important;
+}
+
+.listing-select-wrap.price-select-wrap .listing-select {
+  width: 150px !important;
+  max-width: 150px !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.listing-select {
+  width: 100%;
+  height: 44px;
+  padding: 0 32px 0 12px;
+  border-radius: 10px;
+  border: 1.5px solid #e2ded5;
+  background: #fbfaf7;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #1d1e1a;
+  cursor: pointer;
+  appearance: none;
+  transition: all 0.2s ease;
+}
+
+.listing-select:focus {
+  outline: none;
+  border-color: #ee705b;
+  background: #ffffff;
+}
+
+.listing-select-chevron {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #77766f;
+  pointer-events: none;
+}
+
+/* Property Type Pills */
+.listing-type-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.listing-type-pills-row::-webkit-scrollbar {
+  display: none;
+}
+
+.type-pill-btn {
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border: 1px solid #d8d5cd;
+  background: #ffffff;
+  color: #55544e;
+  white-space: nowrap;
+  transition: all 0.18s ease;
+}
+
+.type-pill-btn:hover {
+  border-color: #ee705b;
+  color: #ee705b;
+}
+
+.type-pill-btn.active {
+  background: #1d1e1a;
+  color: #ffffff;
+  border-color: #1d1e1a;
+}
+
+/* Mobile View Switcher */
+.mobile-view-toggle {
+  display: none;
+  background: #ffffff;
+  border: 1px solid #d8d5cd;
+  border-radius: 10px;
+  overflow: hidden;
+  padding: 2px;
+}
+
+.mobile-toggle-btn {
+  padding: 7px 14px;
+  border: none;
+  background: transparent;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #77766f;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.mobile-toggle-btn.active {
+  background: #1d1e1a;
+  color: #ffffff;
+}
+
+/* Clear filter link */
+.clear-filters-btn {
+  font-size: 12.5px;
+  color: #ee705b;
+  background: none;
+  border: none;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+/* ==========================================================================
+   MAIN SPLIT SCREEN CONTAINER
+   ========================================================================== */
+.split-screen-container {
+  display: flex;
+  flex: 1;
+  position: relative;
+  min-height: 0;
+}
+
+/* Left side: Scrollable Property Cards Column */
+.split-cards-column {
+  flex: 1 1 54%;
+  max-width: 56%;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(29, 30, 26, 0.08);
+  overflow: hidden;
+  background: var(--background, #f4f1eb);
+}
+
+/* Fixed Header above the products */
+.split-cards-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px clamp(16px, 2.5vw, 36px) 14px;
+  background: var(--background, #f4f1eb);
+  border-bottom: 1px solid rgba(29, 30, 26, 0.08);
+  z-index: 20;
+}
+
+.split-cards-count-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1d1e1a;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.split-cards-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 25px;
+  height: 23px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  background: #ee705b;
+  color: #ffffff;
+  border-radius: 9999px;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+
+/* Show Map Toggle on right side of split-cards-header */
+.show-map-toggle-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.show-map-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  background: #ffffff;
+  border: 1.5px solid #d8d5cd;
+  padding: 6px 12px 6px 14px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1d1e1a;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.show-map-toggle-btn:hover {
+  border-color: #ee705b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(238, 112, 91, 0.12);
+}
+
+.show-map-toggle-btn.active {
+  border-color: #1d1e1a;
+}
+
+.toggle-switch-pill {
+  width: 34px;
+  height: 20px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+  position: relative;
+  transition: background-color 0.22s ease;
+  flex-shrink: 0;
+}
+
+.toggle-switch-pill.on {
+  background: #1d1e1a;
+}
+
+.toggle-switch-pill.off {
+  background: #d8d5cd;
+}
+
+.toggle-switch-circle {
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toggle-switch-pill.on .toggle-switch-circle {
+  transform: translateX(14px);
+}
+
+.toggle-switch-pill.off .toggle-switch-circle {
+  transform: translateX(0);
+}
+
+/* Dedicated Product Scroll Body with Right-Side Scrollbar */
+.split-cards-scroll-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px clamp(16px, 2.5vw, 36px) 60px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Hide WebKit Scrollbar while preserving scrollability */
+.split-cards-scroll-body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Full Width Cards Layout when Map is Toggled Off */
+.split-cards-column.cards-full-width {
+  flex: 1 1 100%;
+  max-width: 100%;
+  border-right: none;
+}
+
+.split-cards-column.cards-full-width .split-cards-header {
+  padding: 18px clamp(16px, 3.5vw, 48px) 14px;
+}
+
+.split-cards-column.cards-full-width .split-cards-scroll-body {
+  padding: 24px clamp(16px, 3.5vw, 48px) 60px;
+}
+
+.split-cards-column.cards-full-width .split-cards-grid {
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.split-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 22px;
+}
+
+/* Right side: Fixed/Sticky Map */
+.split-map-column {
+  flex: 1 1 46%;
+  width: 44%;
+  height: 100%;
+  background: #e5e3dc;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   PROPERTY CARD STYLES
+   ========================================================================== */
+.property-card-item {
+  scroll-margin-top: 190px;
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1.5px solid #eae7df;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  position: relative;
+}
+
+.property-card-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e1;
+}
+
+.property-card-item.selected-card {
+  border-color: #ee705b;
+  box-shadow: 0 0 0 3px rgba(238, 112, 91, 0.2), 0 14px 32px rgba(238, 112, 91, 0.12);
+  transform: translateY(-4px);
+}
+
+.property-card-image-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 11.5;
+  min-height: 230px;
+  overflow: hidden;
+  background: #e2ded5;
+}
+
+.property-card-image-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.property-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.property-card-item:hover .property-card-img {
+  transform: scale(1.04);
+}
+
+/* Card Image Carousel Navigation Controls */
+.card-carousel-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.22);
+  color: #1d1e1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s ease, color 0.15s ease;
+  z-index: 15;
+}
+
+.card-carousel-prev {
+  left: 7px;
+}
+
+.card-carousel-next {
+  right: 7px;
+}
+
+.property-card-item:hover .card-carousel-nav-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.card-carousel-nav-btn:hover {
+  background: #ffffff;
+  color: #ee705b;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.28);
+}
+
+.card-carousel-dots {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  z-index: 14;
+  background: rgba(18, 19, 16, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  padding: 3px 8px;
+  border-radius: 9999px;
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.property-card-item:hover .card-carousel-dots {
+  opacity: 1;
+}
+
+.card-carousel-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.card-carousel-dot.active {
+  width: 14px;
+  border-radius: 9999px;
+  background: #ffffff;
+}
+
+.property-card-badge-top {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 50px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.property-card-mode-badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: 6px;
+  backdrop-filter: blur(8px);
+}
+
+.property-card-mode-badge.mode-buy {
+  background: rgba(29, 30, 26, 0.88);
+  color: #ffffff;
+}
+
+.property-card-mode-badge.mode-rent {
+  background: rgba(22, 163, 74, 0.9);
+  color: #ffffff;
+}
+
+.property-card-mode-badge.mode-short-term {
+  background: rgba(238, 112, 91, 0.92);
+  color: #ffffff;
+}
+
+.property-card-trending-badge {
+  background: rgba(255, 255, 255, 0.94);
+  color: #1d1e1a;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.property-card-save-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.property-card-save-btn:hover {
+  transform: scale(1.12);
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+}
+
+.property-card-save-btn.saved {
+  background: #ffffff;
+}
+
+.property-card-badge-bottom {
+  position: absolute;
+  bottom: 10px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.property-card-type-badge {
+  background: rgba(0, 0, 0, 0.65);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 5px;
+  backdrop-filter: blur(4px);
+}
+
+.property-card-pincode-badge {
+  background: rgba(2, 132, 199, 0.85);
+  color: #ffffff;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 3px 7px;
+  border-radius: 5px;
+  backdrop-filter: blur(4px);
+}
+
+.property-card-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.property-card-price-wrap {
+  margin-bottom: 5px;
+  display: flex;
+  align-items: baseline;
+}
+
+.property-card-price {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1d1e1a;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.property-card-badges-row,
+.property-card-badges-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 9px;
+}
+
+.property-card-type-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #3b3a35;
+  background: #f1ede4;
+  border: 1px solid #e2ddd3;
+  padding: 2.5px 7.5px;
+  border-radius: 5px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.property-card-status {
+  font-size: 11px;
+  font-weight: 600;
+  color: #16a34a;
+  background: #f0fdf4;
+  border: 1px solid #dcfce7;
+  padding: 2.5px 7.5px;
+  border-radius: 5px;
+  line-height: 1.2;
+}
+
+.property-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 0 0 6px 0;
+}
+
+.property-card-title-link {
+  color: #1d1e1a;
+  transition: color 0.15s ease;
+}
+
+.property-card-title-link:hover {
+  color: #ee705b;
+}
+
+.property-card-location {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: #77766f;
+  margin-bottom: 12px;
+}
+
+.location-icon {
+  color: #ee705b;
+  flex-shrink: 0;
+}
+
+.location-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.property-card-specs-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  border-top: 1px solid #f2eee6;
+  border-bottom: 1px solid #f2eee6;
+  margin-bottom: 14px;
+}
+
+.spec-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.spec-divider {
+  color: #d1d5db;
+  font-size: 12px;
+}
+
+/* Dealer Profile Footer on Card */
+.property-card-dealer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 2px;
+}
+
+.dealer-info-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.dealer-avatar-wrap {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.dealer-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  object-fit: cover;
+  border: 1.5px solid #ee705b;
+}
+
+.dealer-verified-dot {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  background: #0284c7;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 800;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #ffffff;
+}
+
+.dealer-text-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.dealer-name-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.dealer-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1d1e1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dealer-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: #0284c7;
+}
+
+.dealer-company-name {
+  font-size: 11.5px;
+  color: #77766f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.property-card-open-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #1d1e1a;
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
+}
+
+.property-card-open-btn:hover {
+  background: #ee705b;
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   MAP COMPONENT & PINS STYLING
+   ========================================================================== */
+.property-map-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.property-map-canvas {
+  width: 100%;
+  height: 100%;
+  min-height: 480px;
+  z-index: 1;
+}
+
+.property-map-canvas.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.property-map-overlay-header {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.property-map-badge {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+  padding: 7px 14px;
+  border-radius: 9999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #1d1e1a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  pointer-events: auto;
+}
+
+.property-map-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.property-map-btn {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1d1e1a;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.property-map-btn:hover {
+  background: #ffffff;
+  color: #ee705b;
+  transform: translateY(-1px);
+}
+
+/* Floating Zoom Controls (Right Side) */
+.property-map-zoom-controls {
+  position: absolute;
+  top: 66px;
+  right: 14px;
+  z-index: 25;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.property-map-zoom-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  color: #1d1e1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-weight: 700;
+  padding: 0;
+}
+
+.property-map-zoom-btn:hover {
+  background: #f4f1eb;
+  color: #ee705b;
+}
+
+.property-map-zoom-btn:active {
+  background: #e7e3da;
+}
+
+.property-map-zoom-divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* Hide any default Leaflet zoom controls completely */
+.leaflet-control-zoom {
+  display: none !important;
+}
+
+.property-map-tip {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 20;
+  background: rgba(29, 30, 26, 0.88);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-size: 11.5px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+/* Custom Leaflet Map Marker Pins - Location Pin Mark */
+.property-map-marker-container {
+  background: transparent !important;
+  border: none !important;
+}
+
+.property-map-marker-container:has(.selected),
+.leaflet-marker-icon:has(.selected) {
+  z-index: 1000000 !important;
+}
+
+.property-map-pin,
+.property-map-pin-mark {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  cursor: pointer;
+  position: relative;
+  transform-origin: 15px 38px;
+  transition: transform 0.22s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.pin-mark-graphic {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.pin-mark-svg {
+  display: block;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.28));
+  transition: all 0.2s ease;
+}
+
+.pin-mark-body {
+  transition: fill 0.2s ease, stroke 0.2s ease;
+}
+
+/* Hover / Selected Floating Price Badge */
+.pin-hover-badge {
+  position: absolute;
+  bottom: 42px;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px) scale(0.92);
+  background: #1d1e1a;
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.32);
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 100;
+}
+
+.pin-hover-badge::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 4px;
+  border-style: solid;
+  border-color: #1d1e1a transparent transparent transparent;
+}
+
+/* Pin Hover & Selected States */
+.property-map-pin:hover,
+.property-map-pin.selected,
+.property-map-pin-mark:hover,
+.property-map-pin-mark.selected {
+  transform: scale(1.24);
+  z-index: 100000 !important;
+}
+
+.property-map-pin:hover .pin-hover-badge,
+.property-map-pin.selected .pin-hover-badge,
+.property-map-pin-mark:hover .pin-hover-badge,
+.property-map-pin-mark.selected .pin-hover-badge {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.property-map-pin-mark:hover .pin-mark-body {
+  fill: #e11d48;
+}
+
+.property-map-pin-mark.selected .pin-mark-body {
+  fill: #ee705b;
+}
+
+.property-map-pin-mark.selected .pin-hover-badge {
+  background: #ee705b;
+  box-shadow: 0 4px 16px rgba(238, 112, 91, 0.45);
+}
+
+.property-map-pin-mark.selected .pin-hover-badge::after {
+  border-color: #ee705b transparent transparent transparent;
+}
+
+/* Custom Popup Card */
+.property-custom-popup .leaflet-popup-content-wrapper {
+  border-radius: 14px;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+}
+
+.property-custom-popup .leaflet-popup-content {
+  margin: 0;
+  width: 250px !important;
+}
+
+.map-popup-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.map-popup-img {
+  width: 100%;
+  height: 120px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.map-popup-mode-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.75);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.map-popup-content {
+  padding: 12px;
+}
+
+.map-popup-price {
+  font-size: 16px;
+  font-weight: 800;
+  color: #ee705b;
+  margin-bottom: 3px;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.map-popup-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1d1e1a;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.map-popup-location {
+  font-size: 11.5px;
+  color: #77766f;
+  margin-bottom: 6px;
+}
+
+.map-popup-specs {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #4b5563;
+  margin-bottom: 8px;
+}
+
+.map-popup-dealer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #1d1e1a;
+  margin-bottom: 10px;
+  border-top: 1px solid #f2eee6;
+  padding-top: 6px;
+}
+
+.map-popup-dealer-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  object-fit: cover;
+}
+
+.map-popup-link {
+  display: block;
+  text-align: center;
+  background: #1d1e1a;
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.map-popup-link:hover {
+  background: #ee705b;
+}
+
+/* ==========================================================================
+   MULTI-DEVICE RESPONSIVE DESIGN
+   Supports: Laptop (1024px), Tablet (768px), Mobile L (425px),
+             Mobile M (375px), Mobile S (320px)
+   ========================================================================== */
+
+/* ── 1. LAPTOP, DESKTOP & TABLET (>= 768px) ──────────────────────────
+   Side-by-side split screen: Left cards, Right sticky map.
+   Show Map toggle switch is active and controls map visibility.
+   ──────────────────────────────────────────────────────────────────────── */
+@media (min-width: 768px) {
+  /* Never show mobile view switcher when map is side-by-side */
+  .mobile-view-toggle {
+    display: none !important;
+  }
+
+  /* Show the Show Map toggle switch inside the cards header */
+  .show-map-toggle-wrap {
+    display: flex !important;
+  }
+
+  /* Full viewport height without window scroll - headers and Show Map line ALWAYS remain visible */
+  .property-listing-page {
+    height: calc(100vh - 82px);
+    max-height: calc(100vh - 82px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .listing-filter-bar {
+    flex-shrink: 0;
+    position: relative;
+    top: auto;
+    z-index: 30;
+  }
+
+  .split-screen-container {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
+    max-height: none;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+  }
+
+  .split-cards-column {
+    flex: 1 1 54%;
+    max-width: 56%;
+    height: 100%;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-right: 1px solid rgba(29, 30, 26, 0.08);
+    background: var(--background, #f4f1eb);
+  }
+
+  .split-cards-header {
+    flex-shrink: 0;
+  }
+
+  .split-cards-scroll-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .split-cards-column.cards-full-width {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .split-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+    gap: 18px;
+  }
+
+  .split-map-column {
+    flex: 1 1 46%;
+    width: 44%;
+    height: 100%;
+    max-height: 100%;
+    position: relative;
+    top: auto;
+    overflow: hidden;
+    display: block !important;
+  }
+
+  .split-map-column .property-map-container {
+    height: 100%;
+    width: 100%;
+  }
+
+  .mobile-hide-list {
+    display: flex !important;
+  }
+
+  .mobile-hide-map,
+  .mobile-only-hide-map {
+    display: block !important;
+  }
+}
+
+/* ── 2. MOBILE (< 768px - covering 425px, 375px, 320px) ────────────────
+   Clean mobile experience:
+   - "Show Map" button or "List / Map" mobile switcher lets user switch views.
+   - In List mode: Cards take 100% width (never leave empty blank space).
+   - In Map mode: Map takes 100% width and full viewport height.
+   ──────────────────────────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  /* Show both toggle options on mobile so user has full control */
+  .show-map-toggle-wrap {
+    display: flex !important;
+  }
+
+  /* Show Mobile List / Map toggle switcher in top filter bar */
+  .mobile-view-toggle {
+    display: flex !important;
+  }
+
+  .split-screen-container {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .split-cards-column {
+    max-width: 100%;
+    width: 100%;
+    flex: 1 1 100%;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    border-right: none;
+    background: transparent;
+  }
+
+  .split-cards-header {
+    position: sticky;
+    top: 68px;
+    z-index: 25;
+    background: var(--background, #f4f1eb);
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(29, 30, 26, 0.08);
+  }
+
+  .split-cards-scroll-body {
+    height: auto;
+    overflow-y: visible;
+    overflow-x: hidden;
+    padding: 14px 14px 50px;
+  }
+
+  .split-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .split-map-column {
+    width: 100%;
+    flex: 1 1 100%;
+    position: relative;
+    top: 0;
+    height: calc(100vh - 160px);
+    min-height: 480px;
+  }
+
+  /* Mobile List vs Map view switcher actions */
+  .mobile-hide-list {
+    display: none !important;
+  }
+
+  .mobile-hide-map,
+  .mobile-only-hide-map {
+    display: none !important;
+  }
+}
+
+/* ── 3. TABLET SPECIFIC (641px to 1023px - e.g. 768px iPad) ──────────── */
+@media (min-width: 641px) and (max-width: 1023px) {
+  .listing-filter-bar {
+    padding: 14px 24px;
+    top: auto;
+  }
+
+  .listing-filter-top-row {
+    gap: 10px;
+  }
+
+  .listing-search-input-wrap {
+    flex: 1 1 240px;
+  }
+
+  .split-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 20px;
+  }
+}
+
+/* ── 4. MOBILE LARGE (425px down to 376px) ───────────────────────────── */
+@media (max-width: 640px) {
+  .listing-filter-bar {
+    padding: 12px 14px;
+    top: 68px;
+  }
+
+  .listing-filter-top-row {
+    gap: 8px;
+  }
+
+  .listing-search-input-wrap {
+    flex: 1 1 100%;
+    min-width: 100%;
+  }
+
+  .listing-search-input {
+    height: 40px;
+    font-size: 13.5px;
+  }
+
+  .listing-filter-controls-group {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .listing-select-wrap {
+    flex: 1 1 calc(50% - 5px);
+    min-width: 120px;
+  }
+
+  .listing-select {
+    height: 38px;
+    font-size: 12.5px;
+    padding: 0 28px 0 10px;
+  }
+
+  .mobile-view-toggle {
+    margin-left: auto;
+  }
+
+  .split-cards-header {
+    padding: 12px 14px;
+    top: 68px;
+  }
+
+  .split-cards-count-title {
+    font-size: 17px;
+  }
+
+  .split-cards-scroll-body {
+    padding: 14px 14px 50px;
+  }
+
+  .split-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .property-card-body {
+    padding: 14px;
+  }
+
+  .property-card-price {
+    font-size: 19px;
+  }
+
+  .property-card-badges-row {
+    gap: 5px;
+  }
+}
+
+/* ── 5. MOBILE MEDIUM (375px down to 341px - e.g. iPhone standard) ────── */
+@media (max-width: 400px) {
+  .listing-filter-bar {
+    padding: 10px 12px;
+    top: 66px;
+  }
+
+  .listing-search-input {
+    height: 38px;
+    font-size: 13px;
+    padding: 0 12px 0 38px;
+  }
+
+  .listing-search-icon {
+    left: 12px;
+  }
+
+  .listing-select-wrap {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 105px;
+  }
+
+  .listing-select {
+    height: 36px;
+    font-size: 12px;
+    padding: 0 24px 0 8px;
+  }
+
+  .listing-type-pills-row {
+    margin-top: 8px;
+    gap: 6px;
+  }
+
+  .type-pill-btn {
+    padding: 5px 12px;
+    font-size: 11.5px;
+  }
+
+  .split-cards-header {
+    padding: 10px 12px;
+    top: 66px;
+  }
+
+  .split-cards-count-title {
+    font-size: 16px;
+  }
+
+  .split-cards-scroll-body {
+    padding: 12px 12px 40px;
+  }
+
+  .property-card-price {
+    font-size: 18px;
+  }
+
+  .property-card-title {
+    font-size: 15px;
+  }
+
+  .property-card-specs-row {
+    font-size: 12px;
+    gap: 8px;
+  }
+
+  .mobile-toggle-btn {
+    padding: 5px 10px;
+    font-size: 11.5px;
+  }
+}
+
+/* ── 6. MOBILE SMALL (320px down - e.g. iPhone SE / Galaxy Fold) ──────── */
+@media (max-width: 340px) {
+  .listing-filter-bar {
+    padding: 8px 8px;
+    top: 64px;
+  }
+
+  .listing-search-input {
+    height: 36px;
+    font-size: 12.5px;
+    padding: 0 8px 0 32px;
+  }
+
+  .listing-search-icon {
+    left: 9px;
+  }
+
+  .listing-select-wrap {
+    flex: 1 1 100%;
+    min-width: 100%;
+  }
+
+  .listing-select {
+    height: 34px;
+    font-size: 11.5px;
+    padding: 0 22px 0 8px;
+  }
+
+  .type-pill-btn {
+    padding: 4px 9px;
+    font-size: 11px;
+  }
+
+  .split-cards-header {
+    padding: 8px 8px;
+    top: 64px;
+  }
+
+  .split-cards-count-title {
+    font-size: 14.5px;
+    gap: 5px;
+  }
+
+  .split-cards-count-badge {
+    min-width: 20px;
+    height: 18px;
+    font-size: 10.5px;
+    padding: 0 5px;
+  }
+
+  .split-cards-scroll-body {
+    padding: 8px 8px 36px;
+  }
+
+  .property-card-body {
+    padding: 10px;
+  }
+
+  .property-card-price {
+    font-size: 17px;
+  }
+
+  .property-card-type-tag,
+  .property-card-status {
+    font-size: 9.5px;
+    padding: 2px 5px;
+  }
+
+  .property-card-title {
+    font-size: 14px;
+  }
+
+  .property-card-location {
+    font-size: 12px;
+  }
+
+  .property-card-specs-row {
+    font-size: 11px;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+}

@@ -1,0 +1,11 @@
+import Link from "next/link";
+
+const posts = [
+	["Field notes", "The case for living a little slower", "A room, a ritual, and the quiet luxury of enough time.", "05.18.26", "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=85"],
+	["Neighborhoods", "A long weekend in Los Feliz", "The coffee window, the canyon walk, and the places we keep coming back to.", "04.29.26", "https://images.unsplash.com/photo-1511818966892-d7d671e672a2?auto=format&fit=crop&w=1200&q=85"],
+	["The good room", "How to make a rental feel like yours", "Five small shifts that change the way a space holds you.", "03.11.26", "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=85"],
+];
+
+export default function BlogPage() {
+	return <main className="app-shell blog-page"><section className="blog-intro"><p className="eyebrow">The Fieldhouse journal</p><h1>Notes on<br /><em>living well.</em></h1><p>Local knowledge, good rooms, and the small observations that make a city feel like home.</p></section><section className="blog-feature"><div className="blog-feature-image" role="img" aria-label="Sunlit interior with a dining table" /><div><p className="eyebrow">Featured story / Field notes</p><h2>The places we remember<br /><em>have a point of view.</em></h2><p>What makes a home stay with us long after we leave? We have been thinking about light, texture, and the feeling of being expected.</p><Link className="text-link" href="#stories">Read the story <span>↗</span></Link></div></section><section className="stories-section" id="stories"><div className="section-heading"><div><p className="eyebrow">From the journal</p><h2>Keep in<br /><em>touch.</em></h2></div><p className="section-note">A monthly dispatch from our side of the city.</p></div><div className="story-grid">{posts.map(([category, title, excerpt, date, image]) => <article className="story-card" key={title}><div className="story-image" style={{ backgroundImage: `url(${image})` }} /><p className="eyebrow">{category} · {date}</p><h3>{title}</h3><p>{excerpt}</p><Link className="text-link" href="#stories">Read more <span>↗</span></Link></article>)}</div></section><footer><span>© 2026 Fieldhouse Realty</span><span>Los Angeles, CA</span><span>Instagram &nbsp; LinkedIn</span></footer></main>;
+}
