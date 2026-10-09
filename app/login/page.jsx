@@ -109,22 +109,23 @@ export default function LoginPage() {
       return;
     }
 
+    const cleanEmail = email.trim().toLowerCase();
     const isAdminCreds =
-      email.toLowerCase() === "admin@fieldhouse.re" ||
-      email.toLowerCase().includes("admin") ||
-      email.toLowerCase().includes("dealer");
+      cleanEmail === "admin@fieldhouse.re" ||
+      cleanEmail.includes("admin") ||
+      cleanEmail.includes("dealer");
 
     try {
       if (mode === "signup") {
         try {
-          await signupUser({ fullName: name || "Client", email, password });
+          await signupUser({ fullName: name || "Client", email: cleanEmail, password });
         } catch (apiErr) {
           console.warn("API signup error (fallback to local session):", apiErr);
         }
 
         const newUser = {
           name: name || "Client User",
-          email: email,
+          email: cleanEmail,
           phone: phone || "+91 98765 43210",
           city: "Surat",
           joined: "October 2026",
@@ -142,32 +143,39 @@ export default function LoginPage() {
       }
 
       // Login Mode
-      const authRes = await loginUser(email, password);
+      const authRes = await loginUser(cleanEmail, password);
       const userData = authRes?.data?.user || authRes?.user;
       const tokenVal = authRes?.data?.token || authRes?.token?.value || authRes?.token;
+
+      const isAdmin = Boolean(
+        isAdminCreds ||
+        userData?.role === "admin" ||
+        userData?.isDealer === true ||
+        (userData?.email && (userData.email.toLowerCase().includes("admin") || userData.email.toLowerCase() === "admin@fieldhouse.re"))
+      );
 
       const loggedInUser = {
         name:
           userData?.fullName ||
           name ||
-          (isAdminCreds
+          (isAdmin
             ? "Fieldhouse Admin (Dealer)"
-            : email.split("@")[0] || "Client"),
-        email: userData?.email || email,
+            : cleanEmail.split("@")[0] || "Client"),
+        email: userData?.email || cleanEmail,
         phone: "+91 98251 67890",
         city: "Ahmedabad",
         joined: "October 2026",
         savedCount: 3,
         alertCount: 2,
         token: tokenVal,
-        role: isAdminCreds || userData?.role === "admin" ? "admin" : "client",
-        isDealer: isAdminCreds,
+        role: isAdmin ? "admin" : "client",
+        isDealer: isAdmin,
       };
 
       saveUserSession(loggedInUser);
 
       // If admin, direct to admin panel; otherwise straight to home page!
-      if (isAdminCreds || loggedInUser.role === "admin") {
+      if (isAdmin) {
         router.push("/admin");
       } else {
         router.push("/");
@@ -180,18 +188,18 @@ export default function LoginPage() {
           ? name || "Client"
           : isAdminCreds
           ? "Fieldhouse Admin (Dealer)"
-          : email.split("@")[0] || "Client";
+          : cleanEmail.split("@")[0] || "Client";
 
       const fallbackUser = {
         name: displayName,
-        email: email,
+        email: cleanEmail,
         phone: phone || "+91 98251 67890",
         city: "Surat",
         joined: "October 2026",
         savedCount: 3,
         alertCount: 2,
         role: isAdminCreds ? "admin" : "client",
-        isDealer: isAdminCreds,
+        isDealer: Boolean(isAdminCreds),
       };
 
       saveUserSession(fallbackUser);
@@ -366,13 +374,82 @@ export default function LoginPage() {
               You are currently signed in as <strong>{user.email}</strong>.
             </p>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px", maxWidth: "280px", margin: "0 auto" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px", maxWidth: "300px", margin: "0 auto" }}>
+              {Boolean(
+                user.role === "admin" ||
+                user.isDealer === true ||
+                (user.email &&
+                  (user.email.toLowerCase().includes("admin") ||
+                    user.email.toLowerCase().includes("dealer") ||
+                    user.email.toLowerCase() === "admin@fieldhouse.re"))
+              ) && (
+                <Link
+                  href="/admin"
+                  className="primary-button"
+                  style={{
+                    background: "#ee705b",
+                    color: "#ffffff",
+                    padding: "12px 20px",
+                    borderRadius: "9999px",
+                    fontWeight: "700",
+                    textDecoration: "none",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                    boxShadow: "0 4px 14px rgba(238, 112, 91, 0.35)",
+                  }}
+                >
+                  <Building2 size={16} />
+                  <span>Open Admin & Dealer Console</span>
+                </Link>
+              )}
+
               <Link
                 href="/profile"
-                className="primary-button"
+                className={
+                  Boolean(
+                    user.role === "admin" ||
+                    user.isDealer === true ||
+                    (user.email &&
+                      (user.email.toLowerCase().includes("admin") ||
+                        user.email.toLowerCase().includes("dealer") ||
+                        user.email.toLowerCase() === "admin@fieldhouse.re"))
+                  )
+                    ? "secondary-button"
+                    : "primary-button"
+                }
                 style={{
-                  background: "#ee705b",
-                  color: "#ffffff",
+                  background: Boolean(
+                    user.role === "admin" ||
+                    user.isDealer === true ||
+                    (user.email &&
+                      (user.email.toLowerCase().includes("admin") ||
+                        user.email.toLowerCase().includes("dealer") ||
+                        user.email.toLowerCase() === "admin@fieldhouse.re"))
+                  )
+                    ? "#ffffff"
+                    : "#ee705b",
+                  color: Boolean(
+                    user.role === "admin" ||
+                    user.isDealer === true ||
+                    (user.email &&
+                      (user.email.toLowerCase().includes("admin") ||
+                        user.email.toLowerCase().includes("dealer") ||
+                        user.email.toLowerCase() === "admin@fieldhouse.re"))
+                  )
+                    ? "#1d1e1a"
+                    : "#ffffff",
+                  border: Boolean(
+                    user.role === "admin" ||
+                    user.isDealer === true ||
+                    (user.email &&
+                      (user.email.toLowerCase().includes("admin") ||
+                        user.email.toLowerCase().includes("dealer") ||
+                        user.email.toLowerCase() === "admin@fieldhouse.re"))
+                  )
+                    ? "1.5px solid #d8d5cd"
+                    : "none",
                   padding: "11px 20px",
                   borderRadius: "9999px",
                   fontWeight: "700",

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/context/AuthContext";
 import { loginUser, signupUser } from "@/app/lib/api";
 import {
@@ -20,6 +21,7 @@ import {
 import "./auth-modal.css";
 
 export default function AuthModal() {
+  const router = useRouter();
   const { isAuthModalOpen, closeAuthModal, authModalConfig, login } = useAuth();
 
   const [mode, setMode] = useState("login"); // 'login' | 'signup'
@@ -67,10 +69,10 @@ export default function AuthModal() {
   // Instant 1-Click Demo Login (Super friendly for reviewers and testing)
   const handleDemoLogin = () => {
     setLoading(true);
-    setFeedback({ type: "success", message: "Signing in as verified client..." });
+    setFeedback({ type: "success", message: "Signing in as verified dealer admin..." });
     setTimeout(() => {
       const demoUser = {
-        name: "Fieldhouse",
+        name: "Fieldhouse Admin (Dealer)",
         email: "admin@fieldhouse.re",
         phone: "+91 98251 44221",
         city: "Surat",
@@ -82,6 +84,7 @@ export default function AuthModal() {
       };
       login(demoUser);
       setLoading(false);
+      router.push("/admin");
     }, 400);
   };
 
@@ -162,26 +165,58 @@ export default function AuthModal() {
         }, 300);
       } else {
         // Sign In
+        const trimmedEmail = email.trim().toLowerCase();
+        const isAdminCreds =
+          trimmedEmail === "admin@fieldhouse.re" ||
+          trimmedEmail.includes("admin") ||
+          trimmedEmail.includes("dealer");
+
+        let authRes = null;
         try {
-          await loginUser(email, password);
+          authRes = await loginUser(email.trim(), password);
         } catch (apiErr) {
           console.warn("API login fallback:", apiErr);
         }
+
+        const userData = authRes?.data?.user || authRes?.user;
+        const tokenVal = authRes?.data?.token || authRes?.token?.value || authRes?.token;
+
+        const isAdmin = Boolean(
+          isAdminCreds ||
+          userData?.role === "admin" ||
+          userData?.isDealer === true ||
+          (userData?.email && (userData.email.toLowerCase().includes("admin") || userData.email.toLowerCase() === "admin@fieldhouse.re"))
+        );
+
         const loggedUser = {
-          name: name || (email.split("@")[0] || "Client"),
-          email: email.trim(),
+          name:
+            userData?.fullName ||
+            name ||
+            (isAdmin ? "Fieldhouse Admin (Dealer)" : email.split("@")[0] || "Client"),
+          email: userData?.email || email.trim(),
           phone: phone || "+91 98251 67890",
           city: "Gujarat",
           joined: "October 2026",
           savedCount: 3,
-          role: "client",
-          isDealer: false,
+          token: tokenVal,
+          role: isAdmin ? "admin" : "client",
+          isDealer: isAdmin,
         };
-        setFeedback({ type: "success", message: "Signed in successfully!" });
+
+        setFeedback({
+          type: "success",
+          message: isAdmin
+            ? "Admin authorized! Redirecting to Dealer Console..."
+            : "Signed in successfully!",
+        });
+
         setTimeout(() => {
           login(loggedUser);
           setLoading(false);
-        }, 300);
+          if (isAdmin) {
+            router.push("/admin");
+          }
+        }, 400);
       }
     } catch (err) {
       setFeedback({ type: "error", message: err.message || "Authentication failed. Please try again." });

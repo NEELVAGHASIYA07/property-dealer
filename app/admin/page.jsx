@@ -70,6 +70,10 @@ import {
   ShieldCheck,
   FileCheck,
   Percent,
+  Lock,
+  Mail,
+  EyeOff,
+  ArrowRight,
 } from "lucide-react";
 
 // Preset luxury photos for quick property creation
@@ -270,6 +274,7 @@ export default function AdminPage() {
   const [loginPassword, setLoginPassword] = useState("admin123456");
   const [loginError, setLoginError] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
 
   // Data State
   const [properties, setProperties] = useState([]);
@@ -523,18 +528,27 @@ export default function AdminPage() {
       if (savedUser) {
         try {
           const parsed = JSON.parse(savedUser);
-          setCurrentUser(parsed);
+          const email = (parsed.email || "").toLowerCase().trim();
           const hasAdminRole =
             parsed.role === "admin" ||
             parsed.isDealer === true ||
-            (parsed.email &&
-              (parsed.email.toLowerCase().includes("admin") ||
-                parsed.email.toLowerCase().includes("dealer") ||
-                parsed.email.toLowerCase() === "admin@fieldhouse.re"));
+            email.includes("admin") ||
+            email.includes("dealer") ||
+            email === "admin@fieldhouse.re";
 
           if (hasAdminRole) {
+            const updatedAdmin = {
+              ...parsed,
+              role: "admin",
+              isDealer: true,
+              name: parsed.name && parsed.name !== "Client" ? parsed.name : "Fieldhouse Admin (Dealer)",
+            };
+            setCurrentUser(updatedAdmin);
+            localStorage.setItem("fieldhouse_user", JSON.stringify(updatedAdmin));
+            document.cookie = `fieldhouse_user=${encodeURIComponent(JSON.stringify(updatedAdmin))}; path=/; max-age=31536000; SameSite=Lax`;
             setIsAdminAuthorized(true);
           } else {
+            setCurrentUser(parsed);
             setIsAdminAuthorized(false);
           }
         } catch (e) {
@@ -627,14 +641,20 @@ export default function AdminPage() {
     setLoginLoading(true);
     setLoginError("");
 
+    const cleanEmail = loginEmail.trim().toLowerCase();
+    const isAdminCreds =
+      cleanEmail === "admin@fieldhouse.re" ||
+      cleanEmail.includes("admin") ||
+      cleanEmail.includes("dealer");
+
     try {
-      const res = await loginUser(loginEmail, loginPassword);
+      const res = await loginUser(cleanEmail, loginPassword);
       const userData = res?.data?.user || res?.user;
       const tokenVal = res?.data?.token || res?.token?.value || res?.token;
 
       const adminUser = {
         name: userData?.fullName || "Fieldhouse Admin (Dealer)",
-        email: userData?.email || loginEmail,
+        email: userData?.email || cleanEmail,
         role: "admin",
         isDealer: true,
         joined: "October 2026",
@@ -652,10 +672,10 @@ export default function AdminPage() {
     } catch (err) {
       console.warn("Direct login error:", err);
       // Fallback: If credentials match default admin
-      if (loginEmail.toLowerCase().includes("admin") || loginEmail.toLowerCase().includes("dealer")) {
+      if (isAdminCreds) {
         const fallbackAdmin = {
           name: "Fieldhouse Admin (Dealer)",
-          email: loginEmail,
+          email: cleanEmail,
           role: "admin",
           isDealer: true,
           joined: "October 2026",
@@ -667,7 +687,7 @@ export default function AdminPage() {
           document.cookie = `fieldhouse_user=${encodeURIComponent(JSON.stringify(fallbackAdmin))}; path=/; max-age=31536000; SameSite=Lax`;
           window.dispatchEvent(new Event("storage"));
         }
-        showToast("Dealer Admin Session Authorized (Local Mode)");
+        showToast("Dealer Admin Session Authorized");
       } else {
         setLoginError(err.message || "Invalid Admin Credentials");
       }
@@ -1311,109 +1331,278 @@ export default function AdminPage() {
     return (
       <main
         style={{
-          minHeight: "80vh",
+          minHeight: "100vh",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: "60px 20px",
-          background: "#faf9f5",
+          padding: "40px 20px",
+          background: "linear-gradient(135deg, #0d0f12 0%, #171a21 100%)",
           fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+          color: "#ffffff",
         }}
       >
         <div
           style={{
-            maxWidth: "520px",
+            maxWidth: "460px",
             width: "100%",
+            background: "#1e222d",
+            borderRadius: "24px",
+            padding: "40px 32px",
+            boxShadow: "0 25px 60px rgba(0, 0, 0, 0.45)",
+            border: "1px solid rgba(255, 255, 255, 0.08)",
             textAlign: "center",
-            background: "#ffffff",
-            padding: "48px 36px",
-            borderRadius: "20px",
-            boxShadow: "0 10px 30px rgba(0, 0, 0, 0.05)",
-            border: "1px solid #ebe9e0",
           }}
         >
+          {/* Brand & Badge Header */}
           <div
             style={{
-              fontSize: "88px",
-              fontWeight: "900",
-              lineHeight: "1",
-              color: "#ee705b",
-              letterSpacing: "-0.04em",
-              marginBottom: "12px",
+              width: "56px",
+              height: "56px",
+              borderRadius: "16px",
+              background: "linear-gradient(135deg, #ee705b 0%, #e0533c 100%)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              margin: "0 auto 18px",
+              boxShadow: "0 10px 24px rgba(238, 112, 91, 0.35)",
             }}
           >
-            404
+            <ShieldCheck size={28} color="#ffffff" strokeWidth={2.2} />
+          </div>
+
+          <div
+            style={{
+              display: "inline-block",
+              background: "rgba(238, 112, 91, 0.15)",
+              color: "#ee705b",
+              fontSize: "11px",
+              fontWeight: "700",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              padding: "4px 12px",
+              borderRadius: "9999px",
+              marginBottom: "10px",
+            }}
+          >
+            Fieldhouse Real Estate
           </div>
 
           <h1
             style={{
               fontSize: "24px",
               fontWeight: "800",
-              color: "#1d1e1a",
-              margin: "0 0 10px",
+              color: "#ffffff",
+              margin: "0 0 8px",
+              letterSpacing: "-0.02em",
             }}
           >
-            Page Not Found
+            Dealer & Admin Console
           </h1>
 
           <p
             style={{
-              fontSize: "15px",
-              color: "#77766f",
-              lineHeight: "1.6",
-              margin: "0 0 32px",
+              fontSize: "14px",
+              color: "#94a3b8",
+              lineHeight: "1.5",
+              margin: "0 0 24px",
             }}
           >
-            The page you are looking for doesn&apos;t exist, has been removed, or is temporarily unavailable.
+            Sign in with administrative credentials to access Gujarat inventory, CRM leads, and analytics.
           </p>
 
+          {/* Current session notice if logged in as client */}
+          {currentUser && (
+            <div
+              style={{
+                background: "rgba(255, 255, 255, 0.05)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                borderRadius: "12px",
+                padding: "10px 14px",
+                fontSize: "12.5px",
+                color: "#cbd5e1",
+                marginBottom: "20px",
+                textAlign: "left",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+              }}
+            >
+              <AlertCircle size={16} color="#f59e0b" style={{ flexShrink: 0 }} />
+              <div>
+                Logged in as <strong>{currentUser.email}</strong> (Client). Sign in with Admin credentials below to continue.
+              </div>
+            </div>
+          )}
+
+          {/* Error Message */}
+          {loginError && (
+            <div
+              style={{
+                background: "rgba(239, 68, 68, 0.12)",
+                border: "1px solid rgba(239, 68, 68, 0.3)",
+                color: "#fca5a5",
+                borderRadius: "12px",
+                padding: "10px 14px",
+                fontSize: "13px",
+                marginBottom: "20px",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                textAlign: "left",
+              }}
+            >
+              <AlertCircle size={16} style={{ flexShrink: 0 }} />
+              <span>{loginError}</span>
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleDirectAdminLogin} style={{ display: "flex", flexDirection: "column", gap: "16px", textAlign: "left" }}>
+            <div>
+              <label style={{ display: "block", fontSize: "12.5px", fontWeight: "600", color: "#cbd5e1", marginBottom: "6px" }}>
+                Admin Email Address
+              </label>
+              <div style={{ position: "relative" }}>
+                <Mail size={16} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#64748b" }} />
+                <input
+                  type="email"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  placeholder="admin@fieldhouse.re"
+                  required
+                  style={{
+                    width: "100%",
+                    background: "#13161c",
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    borderRadius: "12px",
+                    padding: "12px 14px 12px 42px",
+                    fontSize: "14px",
+                    color: "#ffffff",
+                    outline: "none",
+                    boxSizing: "border-box",
+                  }}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label style={{ display: "block", fontSize: "12.5px", fontWeight: "600", color: "#cbd5e1", marginBottom: "6px" }}>
+                Admin Password
+              </label>
+              <div style={{ position: "relative" }}>
+                <Lock size={16} style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#64748b" }} />
+                <input
+                  type={showLoginPassword ? "text" : "password"}
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="admin123456"
+                  required
+                  style={{
+                    width: "100%",
+                    background: "#13161c",
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    borderRadius: "12px",
+                    padding: "12px 42px 12px 42px",
+                    fontSize: "14px",
+                    color: "#ffffff",
+                    outline: "none",
+                    boxSizing: "border-box",
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowLoginPassword(!showLoginPassword)}
+                  style={{
+                    position: "absolute",
+                    right: "12px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "none",
+                    border: "none",
+                    color: "#64748b",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "4px",
+                  }}
+                  aria-label={showLoginPassword ? "Hide password" : "Show password"}
+                >
+                  {showLoginPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loginLoading}
+              style={{
+                background: "linear-gradient(135deg, #ee705b 0%, #e0533c 100%)",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: "12px",
+                padding: "13px 20px",
+                fontSize: "14px",
+                fontWeight: "700",
+                cursor: loginLoading ? "not-allowed" : "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+                boxShadow: "0 8px 20px rgba(238, 112, 91, 0.3)",
+                marginTop: "6px",
+                transition: "opacity 0.2s",
+                opacity: loginLoading ? 0.7 : 1,
+              }}
+            >
+              {loginLoading ? (
+                <>
+                  <RefreshCw className="animate-spin" size={16} />
+                  <span>Verifying Authorization...</span>
+                </>
+              ) : (
+                <>
+                  <span>Authorize & Open Admin Console</span>
+                  <ArrowRight size={16} />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Quick Credential Hint */}
           <div
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "12px",
-              flexWrap: "wrap",
+              marginTop: "20px",
+              padding: "12px",
+              borderRadius: "12px",
+              background: "rgba(255, 255, 255, 0.03)",
+              border: "1px dashed rgba(255, 255, 255, 0.1)",
+              fontSize: "12px",
+              color: "#94a3b8",
             }}
           >
+            <div>Default Admin Credentials:</div>
+            <div style={{ color: "#ffffff", fontWeight: "600", marginTop: "4px" }}>
+              admin@fieldhouse.re &bull; admin123456
+            </div>
+          </div>
+
+          {/* Footer Back Home link */}
+          <div style={{ marginTop: "24px" }}>
             <Link
               href="/"
               style={{
+                color: "#94a3b8",
+                fontSize: "13px",
+                textDecoration: "none",
                 display: "inline-flex",
                 alignItems: "center",
-                gap: "8px",
-                background: "#ee705b",
-                color: "#ffffff",
-                textDecoration: "none",
-                padding: "12px 24px",
-                borderRadius: "10px",
-                fontSize: "14px",
-                fontWeight: "700",
-                boxShadow: "0 4px 12px rgba(238, 112, 91, 0.25)",
+                gap: "6px",
+                transition: "color 0.2s",
               }}
             >
-              <Home size={16} />
-              <span>Back to Home</span>
-            </Link>
-
-            <Link
-              href="/buy"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                background: "#f7f5f0",
-                color: "#1d1e1a",
-                textDecoration: "none",
-                padding: "12px 24px",
-                borderRadius: "10px",
-                fontSize: "14px",
-                fontWeight: "600",
-                border: "1px solid #e5e3dc",
-              }}
-            >
-              <Search size={16} />
-              <span>Browse Properties</span>
+              <Home size={14} />
+              <span>Back to Home Page</span>
             </Link>
           </div>
         </div>

@@ -219,7 +219,14 @@ export default function ProfilePage() {
     );
   }
 
-  const isDealer = user.role === "admin" || user.isDealer;
+  const isDealer = Boolean(
+    user?.role === "admin" ||
+    user?.isDealer === true ||
+    (user?.email &&
+      (user.email.toLowerCase().includes("admin") ||
+        user.email.toLowerCase().includes("dealer") ||
+        user.email.toLowerCase() === "admin@fieldhouse.re"))
+  );
 
   return (
     <main className="profile-page-shell">
