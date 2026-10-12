@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import PropertyCard from "@/app/components/PropertyCard";
 import PropertyMap from "@/app/components/PropertyMap";
+import SoftSandSelect from "@/app/components/SoftSandSelect";
 import { fetchEnrichedProperties } from "@/app/lib/propertiesData";
 import {
   Search,
@@ -45,7 +46,138 @@ const GUJARAT_CITY_AREAS = {
   Gandhinagar: ["Kudasan", "GIFT City Road", "Infocity", "Raysan", "Sargasan", "Sector 8", "Sector 21", "Vavol"],
 };
 
-const PROPERTY_TYPES = ["All", "Apartment", "Villa", "Bungalow", "Penthouse", "Plot", "Row House","Studio", "Home"];
+const MODE_PROPERTY_TYPES = {
+  buy: [
+    "Apartment",
+    "Independent House",
+    "Villa/Bungalow",
+    "Plot/Land",
+    "Commercial Property",
+  ],
+  rent: [
+    "Apartment",
+    "Independent House",
+    "Villa/Bungalow",
+    "Studio",
+    "Room",
+    "Commercial Property",
+  ],
+  "short-term": [
+    "Studio",
+    "Furnished Apartment",
+    "Serviced Apartment",
+    "Villa",
+    "Holiday Home",
+    "Private Room",
+  ],
+};
+
+const SORT_OPTIONS = [
+  { value: "Popularity", label: "Popularity" },
+  { value: "Recent added", label: "Recent added" },
+  { value: "Highest price", label: "Highest price" },
+  { value: "Lowest price", label: "Lowest price" },
+  { value: "Square meters", label: "Square meters" },
+  { value: "Building age", label: "Building age" },
+];
+
+function matchesPropertyType(item, selectedType) {
+  if (!selectedType || selectedType === "All") return true;
+
+  const target = selectedType.toLowerCase().trim();
+  const propType = (item.type || "").toLowerCase().trim();
+  const propName = (item.name || "").toLowerCase();
+  const propDesc = (item.description || "").toLowerCase();
+
+  if (propType === target) return true;
+
+  if (target === "villa/bungalow") {
+    return propType.includes("villa") || propType.includes("bungalow");
+  }
+
+  if (target === "independent house") {
+    return (
+      propType.includes("house") ||
+      propType.includes("bungalow") ||
+      propType.includes("home") ||
+      propType.includes("row house") ||
+      propType.includes("independent")
+    );
+  }
+
+  if (target === "plot/land") {
+    return propType.includes("plot") || propType.includes("land");
+  }
+
+  if (target === "commercial property") {
+    return (
+      propType.includes("commercial") ||
+      propType.includes("office") ||
+      propType.includes("shop") ||
+      propType.includes("retail")
+    );
+  }
+
+  if (target === "furnished apartment") {
+    const isApt = propType.includes("apartment") || propType.includes("flat") || propType.includes("penthouse");
+    const isFurnished =
+      (item.unitDetails?.furnishing || "").toLowerCase().includes("furnished") ||
+      propDesc.includes("furnished");
+    return isApt || isFurnished;
+  }
+
+  if (target === "serviced apartment") {
+    return (
+      propType.includes("serviced") ||
+      propDesc.includes("serviced") ||
+      propType.includes("apartment") ||
+      propType.includes("flat")
+    );
+  }
+
+  if (target === "holiday home") {
+    return (
+      propType.includes("holiday") ||
+      propType.includes("home") ||
+      propType.includes("villa") ||
+      propType.includes("cottage") ||
+      propDesc.includes("stay") ||
+      propDesc.includes("resort")
+    );
+  }
+
+  if (target === "private room" || target === "room") {
+    return (
+      propType.includes("room") ||
+      propName.includes("room") ||
+      propDesc.includes("room") ||
+      item.bedrooms === 1
+    );
+  }
+
+  if (target === "studio") {
+    return (
+      propType.includes("studio") ||
+      propName.includes("studio") ||
+      propDesc.includes("studio") ||
+      item.bedrooms === 1
+    );
+  }
+
+  if (target === "apartment") {
+    return (
+      propType.includes("apartment") ||
+      propType.includes("flat") ||
+      propType.includes("penthouse")
+    );
+  }
+
+  if (target === "villa") {
+    return propType.includes("villa");
+  }
+
+  return propType.includes(target) || target.includes(propType);
+}
 
 export default function PropertyListing({ mode = "buy" }) {
   return (
@@ -65,6 +197,7 @@ function PropertyListingContent({ mode = "buy" }) {
   const [selectedBhk, setSelectedBhk] = useState("");
   const [selectedPriceRange, setSelectedPriceRange] = useState("");
   const [selectedType, setSelectedType] = useState("All");
+  const [sortBy, setSortBy] = useState("Popularity");
 
   // View States
   const [properties, setProperties] = useState([]);
@@ -73,15 +206,22 @@ function PropertyListingContent({ mode = "buy" }) {
   const [showMap, setShowMap] = useState(true); // Default ON
   const [mobileView, setMobileView] = useState("list"); // 'list' | 'map'
 
+  // Active type options depending on page mode (buy, rent, short-term)
+  const activeTypeOptions = useMemo(() => {
+    return MODE_PROPERTY_TYPES[mode] || MODE_PROPERTY_TYPES.buy;
+  }, [mode]);
+
   // Pre-fill from URL query params (e.g. from homepage search widget)
   useEffect(() => {
     const qCity = searchParams.get("city");
     const qBedrooms = searchParams.get("bedrooms");
     const qPriceMin = searchParams.get("priceMin");
     const qPriceMax = searchParams.get("priceMax");
+    const qType = searchParams.get("type");
 
     if (qCity) setSelectedCity(qCity);
     if (qBedrooms) setSelectedBhk(qBedrooms);
+    if (qType) setSelectedType(qType);
     if (qPriceMin || qPriceMax) {
       if (qPriceMin && !qPriceMax) setSelectedPriceRange(`${qPriceMin}+`);
       else if (qPriceMin && qPriceMax) setSelectedPriceRange(`${qPriceMin}-${qPriceMax}`);
@@ -192,12 +332,39 @@ function PropertyListingContent({ mode = "buy" }) {
       }
 
       // 6. Type
-      if (selectedType && selectedType !== "All") {
-        if (item.type?.toLowerCase() !== selectedType.toLowerCase()) return false;
+      if (!matchesPropertyType(item, selectedType)) {
+        return false;
       }
 
       return true;
     }).sort((a, b) => {
+      if (sortBy === "Lowest price") {
+        return (a.price || 0) - (b.price || 0);
+      }
+      if (sortBy === "Highest price") {
+        return (b.price || 0) - (a.price || 0);
+      }
+      if (sortBy === "Square meters") {
+        return (b.size || 0) - (a.size || 0);
+      }
+      if (sortBy === "Recent added") {
+        const aIsNew = a.unitDetails?.age?.toLowerCase().includes("brand new") || a.tag === "Trending";
+        const bIsNew = b.unitDetails?.age?.toLowerCase().includes("brand new") || b.tag === "Trending";
+        if (aIsNew && !bIsNew) return -1;
+        if (!aIsNew && bIsNew) return 1;
+        return String(b.id).localeCompare(String(a.id));
+      }
+      if (sortBy === "Building age") {
+        const getAgeScore = (item) => {
+          const ageStr = (item.unitDetails?.age || "").toLowerCase();
+          if (ageStr.includes("brand new") || ageStr.includes("under construction")) return 0;
+          const match = ageStr.match(/\d+/);
+          return match ? Number(match[0]) : 5;
+        };
+        return getAgeScore(a) - getAgeScore(b);
+      }
+
+      // Default: Popularity
       const aTrending = a.tag === "Trending" || a.tag === "Popular" || String(a.id).startsWith("trend-");
       const bTrending = b.tag === "Trending" || b.tag === "Popular" || String(b.id).startsWith("trend-");
 
@@ -214,6 +381,7 @@ function PropertyListingContent({ mode = "buy" }) {
     selectedPriceRange,
     parsedPriceRange,
     selectedType,
+    sortBy,
   ]);
 
   // Handle map pin selection: scrolls corresponding card into view on left with full photo visible
@@ -267,6 +435,7 @@ function PropertyListingContent({ mode = "buy" }) {
     setSelectedBhk("");
     setSelectedPriceRange("");
     setSelectedType("All");
+    setSortBy("Popularity");
   };
 
   const hasActiveFilters = Boolean(
@@ -296,9 +465,23 @@ function PropertyListingContent({ mode = "buy" }) {
 
           {/* Filter Dropdowns */}
           <div className="listing-filter-controls-group">
+            {/* Property Type Dropdown */}
+            <div className="listing-select-wrap type-select-wrap">
+              <SoftSandSelect
+                className="listing-select"
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
+              >
+                <option value="All">All Types</option>
+                {activeTypeOptions.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </SoftSandSelect>
+            </div>
+
             {/* City Dropdown */}
             <div className="listing-select-wrap">
-              <select
+              <SoftSandSelect
                 className="listing-select"
                 value={selectedCity}
                 onChange={(e) => {
@@ -310,13 +493,12 @@ function PropertyListingContent({ mode = "buy" }) {
                 {GUJARAT_CITIES.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
-              </select>
-              <ChevronDown size={15} className="listing-select-chevron" />
+              </SoftSandSelect>
             </div>
 
             {/* Area Dropdown (Dynamic) */}
             <div className="listing-select-wrap">
-              <select
+              <SoftSandSelect
                 className="listing-select"
                 value={selectedArea}
                 onChange={(e) => setSelectedArea(e.target.value)}
@@ -328,13 +510,12 @@ function PropertyListingContent({ mode = "buy" }) {
                 {(GUJARAT_CITY_AREAS[selectedCity] || []).map((a) => (
                   <option key={a} value={a}>{a}</option>
                 ))}
-              </select>
-              <ChevronDown size={15} className="listing-select-chevron" />
+              </SoftSandSelect>
             </div>
 
             {/* Bedrooms Dropdown */}
             <div className="listing-select-wrap" style={{ minWidth: "115px" }}>
-              <select
+              <SoftSandSelect
                 className="listing-select"
                 value={selectedBhk}
                 onChange={(e) => setSelectedBhk(e.target.value)}
@@ -344,13 +525,12 @@ function PropertyListingContent({ mode = "buy" }) {
                 <option value="2">2 BHK</option>
                 <option value="3">3 BHK</option>
                 <option value="4">4+ BHK</option>
-              </select>
-              <ChevronDown size={15} className="listing-select-chevron" />
+              </SoftSandSelect>
             </div>
 
             {/* Price Range Dropdown */}
-            <div className="listing-select-wrap price-select-wrap" style={{ width: "150px", minWidth: "150px", maxWidth: "150px", flex: "0 0 150px" }}>
-              <select
+            <div className="listing-select-wrap price-select-wrap">
+              <SoftSandSelect
                 className="listing-select"
                 value={selectedPriceRange}
                 onChange={(e) => setSelectedPriceRange(e.target.value)}
@@ -358,8 +538,7 @@ function PropertyListingContent({ mode = "buy" }) {
                 {priceOptions.map((opt) => (
                   <option key={opt.value} value={opt.value}>{opt.label}</option>
                 ))}
-              </select>
-              <ChevronDown size={15} className="listing-select-chevron" />
+              </SoftSandSelect>
             </div>
 
             {/* Reset Filters */}
@@ -398,20 +577,6 @@ function PropertyListingContent({ mode = "buy" }) {
             </div>
           </div>
         </div>
-
-        {/* Property Type Pills Row */}
-        <div className="listing-type-pills-row">
-          {PROPERTY_TYPES.map((type) => (
-            <button
-              key={type}
-              type="button"
-              className={`type-pill-btn ${selectedType === type ? "active" : ""}`}
-              onClick={() => setSelectedType(type)}
-            >
-              {type}
-            </button>
-          ))}
-        </div>
       </section>
 
       {/* ======================================================================
@@ -422,33 +587,50 @@ function PropertyListingContent({ mode = "buy" }) {
         <div className={`split-cards-column ${!showMap ? "cards-full-width" : ""} ${mobileView === "map" ? "mobile-hide-list" : ""}`}>
           <div className="split-cards-header">
             <h2 className="split-cards-count-title">
-              <span>{titlePrefix} {selectedCity ? `in ${selectedCity}` : "across Gujarat"}</span>
-              <span className="split-cards-count-badge">
-                {filteredProperties.length}
+              <span>{titlePrefix} </span>
+              <span className="split-cards-title-city-group">
+                <span>{selectedCity ? `in ${selectedCity}` : "across Gujarat"}</span>
+                <span className="split-cards-count-badge">
+                  {filteredProperties.length}
+                </span>
               </span>
             </h2>
 
-            {/* Show Map Toggle Switch Button */}
-            <div className="show-map-toggle-wrap">
-              <button
-                type="button"
-                className={`show-map-toggle-btn ${showMap ? "active" : ""}`}
-                onClick={() => {
-                  setShowMap((prev) => {
-                    const next = !prev;
-                    setMobileView(next ? "map" : "list");
-                    return next;
-                  });
-                }}
-                aria-pressed={showMap}
-                title={showMap ? "Hide Map" : "Show Map"}
-              >
-                <MapIcon size={15} />
-                <span>Show Map</span>
-                <span className={`toggle-switch-pill ${showMap ? "on" : "off"}`}>
-                  <span className="toggle-switch-circle" />
-                </span>
-              </button>
+            {/* Right Header Actions: Sort By Dropdown & Show Map Toggle */}
+            <div className="split-cards-header-actions">
+              {/* Sort By Dropdown with Soft Sand Theme */}
+              <div className="listing-sort-select-wrap">
+                <SoftSandSelect
+                  className="listing-sort-select"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  options={SORT_OPTIONS}
+                  aria-label="Sort properties"
+                />
+              </div>
+
+              {/* Show Map Toggle Switch Button */}
+              <div className="show-map-toggle-wrap">
+                <button
+                  type="button"
+                  className={`show-map-toggle-btn ${showMap ? "active" : ""}`}
+                  onClick={() => {
+                    setShowMap((prev) => {
+                      const next = !prev;
+                      setMobileView(next ? "map" : "list");
+                      return next;
+                    });
+                  }}
+                  aria-pressed={showMap}
+                  title={showMap ? "Hide Map" : "Show Map"}
+                >
+                  <MapIcon size={15} />
+                  <span>Show Map</span>
+                  <span className={`toggle-switch-pill ${showMap ? "on" : "off"}`}>
+                    <span className="toggle-switch-circle" />
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
 

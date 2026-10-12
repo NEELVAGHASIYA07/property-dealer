@@ -22,6 +22,7 @@ import {
   ShieldAlert,
 } from "lucide-react";
 import "./profile.css";
+import SoftSandSelect from "@/app/components/SoftSandSelect";
 import { useAuth } from "@/app/context/AuthContext";
 
 const GUJARAT_CITIES = [
@@ -680,7 +681,7 @@ export default function ProfilePage() {
 
               <div className="profile-form-group">
                 <label className="profile-form-label">Primary Gujarat City</label>
-                <select
+                <SoftSandSelect
                   className="profile-form-input"
                   value={editCity}
                   onChange={(e) => setEditCity(e.target.value)}
@@ -688,7 +689,7 @@ export default function ProfilePage() {
                   {GUJARAT_CITIES.map((c) => (
                     <option key={c} value={c}>{c}</option>
                   ))}
-                </select>
+                </SoftSandSelect>
               </div>
 
               <div className="profile-modal-actions">

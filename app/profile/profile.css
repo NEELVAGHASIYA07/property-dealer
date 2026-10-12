@@ -508,17 +508,19 @@
 .pref-select {
   width: 100%;
   padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid #d8d5cd;
+  border-radius: 14px;
+  border: 1px solid #DFD2C2;
+  background: #F5EFE7;
+  box-shadow: 0 6px 15px rgba(70, 58, 40, 0.08);
   font-size: 13.5px;
-  color: #1d1e1a;
+  color: #2D2721;
   outline: none;
-  background: #fafaf9;
 }
 
 .pref-select:focus {
-  border-color: #ee705b;
-  background: #ffffff;
+  border-color: #C2B099;
+  background: #F5EFE7;
+  box-shadow: 0 8px 22px rgba(70, 58, 40, 0.12);
 }
 
 /* --- Edit Profile Modal --- */

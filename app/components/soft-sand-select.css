@@ -1,0 +1,395 @@
+/* ==========================================================================
+   SOFT SAND PREMIUM DROPDOWN DESIGN SYSTEM
+   ========================================================================== */
+
+:root {
+  --soft-sand-bg: #F5EFE7;
+  --soft-sand-border: #DFD2C2;
+  --soft-sand-radius: 14px;
+  --soft-sand-shadow: 0 6px 15px rgba(70, 58, 40, 0.08);
+  --soft-sand-text: #2D2721;
+  --soft-sand-menu-bg: #FAF6F0;
+  --soft-sand-menu-radius: 16px;
+  --soft-sand-menu-shadow: 0 20px 44px rgba(95, 78, 59, 0.14);
+  --soft-sand-opt-radius: 10px;
+  --soft-sand-opt-hover: #F0E7DA;
+  --soft-sand-opt-active-bg: #EADCC8;
+  --soft-sand-opt-active-text: #70553D;
+  --soft-sand-arrow: #70553D;
+}
+
+/* Wrapper preserving exact existing width */
+.soft-sand-select-wrap {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  display: block;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+.soft-sand-select-wrap.is-open {
+  z-index: 1000 !important;
+  overflow: visible !important;
+}
+
+/* Contextual stacking */
+.hero-filter-field:has(.soft-sand-select-wrap.is-open),
+.listing-select-wrap:has(.soft-sand-select-wrap.is-open),
+.admin-saas-field:has(.soft-sand-select-wrap.is-open),
+.admin-toolbar-left:has(.soft-sand-select-wrap.is-open),
+.admin-lead-actions:has(.soft-sand-select-wrap.is-open),
+.pref-box:has(.soft-sand-select-wrap.is-open),
+.profile-form-group:has(.soft-sand-select-wrap.is-open) {
+  z-index: 100;
+  position: relative;
+}
+
+/* --- TRIGGER / CLOSED DROPDOWN --- */
+.soft-sand-trigger {
+  width: 100%;
+  min-height: 44px;
+  background: var(--soft-sand-bg);
+  border: 1px solid var(--soft-sand-border);
+  border-radius: var(--soft-sand-radius);
+  box-shadow: var(--soft-sand-shadow);
+  padding: 0 14px;
+  color: var(--soft-sand-text);
+  font-size: 13.5px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: pointer;
+  text-align: left;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  font-family: inherit;
+}
+
+.soft-sand-trigger:hover:not(:disabled) {
+  border-color: #D3C3B0;
+  background: #F2EAE0;
+}
+
+.soft-sand-trigger:focus-visible,
+.soft-sand-select-wrap.is-open .soft-sand-trigger {
+  border-color: #C2B099;
+  background: var(--soft-sand-bg);
+  box-shadow: 0 8px 22px rgba(70, 58, 40, 0.12);
+}
+
+.soft-sand-trigger:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.soft-sand-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--soft-sand-text);
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* --- ARROW --- */
+.soft-sand-arrow {
+  flex-shrink: 0;
+  color: var(--soft-sand-arrow);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
+  pointer-events: none;
+}
+
+.soft-sand-arrow.is-open {
+  transform: rotate(180deg);
+}
+
+/* --- OPENED DROPDOWN MENU --- */
+.soft-sand-menu {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  width: 100%;
+  background: var(--soft-sand-menu-bg);
+  border: 1px solid var(--soft-sand-border);
+  border-radius: var(--soft-sand-menu-radius);
+  padding: 7px;
+  box-shadow: var(--soft-sand-menu-shadow);
+  box-sizing: border-box;
+  max-height: 260px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 1050;
+  animation: softSandMenuFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes softSandMenuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* --- SMART AUTO-FLIP UPWARD (WHEN NOT ENOUGH SPACE BELOW) --- */
+.soft-sand-select-wrap.opens-upward .soft-sand-menu,
+.soft-sand-menu.opens-upward {
+  top: auto !important;
+  bottom: calc(100% + 5px) !important;
+  box-shadow: 0 -16px 36px rgba(95, 78, 59, 0.14) !important;
+  animation: softSandMenuFadeInUp 0.15s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@keyframes softSandMenuFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Sleek Scrollbar */
+.soft-sand-menu::-webkit-scrollbar {
+  width: 5px;
+}
+.soft-sand-menu::-webkit-scrollbar-track {
+  background: transparent;
+}
+.soft-sand-menu::-webkit-scrollbar-thumb {
+  background: var(--soft-sand-border);
+  border-radius: 10px;
+}
+.soft-sand-menu::-webkit-scrollbar-thumb:hover {
+  background: #CDBDAA;
+}
+
+/* --- OPTION ITEMS --- */
+.soft-sand-option {
+  border-radius: var(--soft-sand-opt-radius);
+  background: transparent;
+  padding: 8px 12px;
+  color: var(--soft-sand-text);
+  font-size: 13.5px;
+  font-weight: 400;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  transition: background 0.15s ease, color 0.15s ease;
+  user-select: none;
+  min-height: 36px;
+  box-sizing: border-box;
+  line-height: 1.35;
+}
+
+.soft-sand-option:hover {
+  background: var(--soft-sand-opt-hover);
+  color: var(--soft-sand-text);
+}
+
+.soft-sand-option.is-selected {
+  background: var(--soft-sand-opt-active-bg);
+  color: var(--soft-sand-opt-active-text);
+  font-weight: 600;
+}
+
+.soft-sand-option.is-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Hidden native select for form serialization & a11y */
+.soft-sand-hidden-select {
+  position: absolute !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  pointer-events: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+/* ==========================================================================
+   PAGE-SPECIFIC OVERRIDES PRESERVING ORIGINAL EXACT WIDTHS
+   ========================================================================== */
+
+/* Homepage Hero Filters: Keep existing layout and width */
+.hero-filter-field .soft-sand-select-wrap {
+  width: 100%;
+}
+.hero-filter-field .soft-sand-trigger {
+  min-height: 42px;
+  font-size: 14px;
+}
+
+/* Property Listing Filter Bar: inside .listing-select-wrap */
+.listing-select-wrap .soft-sand-select-wrap {
+  width: 100%;
+}
+.listing-select-wrap .soft-sand-trigger {
+  height: 44px;
+  min-height: 44px;
+  font-size: 13.5px;
+  padding: 0 12px;
+}
+
+/* Price dropdown wrap fixed width preservation */
+.price-select-wrap .soft-sand-select-wrap {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Admin Toolbar Filters: preserve inline-flex/auto sizing without breaking toolbar flex row */
+.soft-sand-select-wrap.admin-filter-select {
+  width: auto;
+  min-width: 165px;
+  flex: 0 0 auto;
+}
+.soft-sand-select-wrap.admin-filter-select .soft-sand-trigger {
+  height: 38px;
+  min-height: 38px;
+  font-size: 13px;
+  padding: 0 12px;
+}
+
+/* Admin Lead Status Select */
+.soft-sand-select-wrap.admin-lead-status-select {
+  width: auto;
+  min-width: 155px;
+  flex: 0 0 auto;
+}
+.soft-sand-select-wrap.admin-lead-status-select .soft-sand-trigger {
+  height: 32px;
+  min-height: 32px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0 10px;
+  border-radius: 10px;
+}
+.soft-sand-select-wrap.admin-lead-status-select .soft-sand-menu {
+  border-radius: 12px;
+  padding: 5px;
+}
+.soft-sand-select-wrap.admin-lead-status-select .soft-sand-option {
+  font-size: 12px;
+  padding: 6px 10px;
+  min-height: 30px;
+}
+
+/* Admin Form Fields (Add/Edit Property modal) */
+.soft-sand-select-wrap.admin-saas-select {
+  width: 100%;
+}
+.soft-sand-select-wrap.admin-saas-select .soft-sand-trigger {
+  min-height: 42px;
+  font-size: 13.5px;
+  padding: 0 14px;
+}
+
+/* Admin Lead Modal Form Field */
+.soft-sand-select-wrap.admin-form-select {
+  width: 100%;
+}
+.soft-sand-select-wrap.admin-form-select .soft-sand-trigger {
+  min-height: 42px;
+  font-size: 13.5px;
+  padding: 0 14px;
+}
+
+/* Preferences & Profile Form Fields */
+.soft-sand-select-wrap.pref-select,
+.soft-sand-select-wrap.profile-form-input {
+  width: 100%;
+}
+.soft-sand-select-wrap.pref-select .soft-sand-trigger,
+.soft-sand-select-wrap.profile-form-input .soft-sand-trigger {
+  min-height: 44px;
+  font-size: 13.5px;
+  padding: 0 14px;
+}
+
+/* ==========================================================================
+   RESPONSIVE (1024px, 768px, 425px, 375px, 320px)
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  .soft-sand-select-wrap.admin-filter-select {
+    min-width: 145px;
+  }
+}
+
+@media (max-width: 768px) {
+  .soft-sand-select-wrap.admin-filter-select {
+    min-width: 135px;
+  }
+  .listing-select-wrap .soft-sand-trigger {
+    height: 40px;
+    min-height: 40px;
+    font-size: 12.5px;
+  }
+}
+
+@media (max-width: 425px) {
+  .soft-sand-menu {
+    max-height: 220px;
+  }
+  .listing-select-wrap .soft-sand-trigger {
+    height: 36px;
+    min-height: 36px;
+    font-size: 12px;
+    padding: 0 10px;
+  }
+  .soft-sand-trigger {
+    font-size: 12.5px;
+  }
+  .soft-sand-option {
+    font-size: 12.5px;
+    padding: 7px 10px;
+    min-height: 32px;
+  }
+}
+
+@media (max-width: 375px) {
+  .listing-select-wrap .soft-sand-trigger {
+    height: 35px;
+    min-height: 35px;
+    font-size: 11.5px;
+    padding: 0 8px;
+  }
+  .soft-sand-option {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 320px) {
+  .soft-sand-trigger {
+    padding: 0 8px;
+    font-size: 11.5px;
+  }
+  .soft-sand-option {
+    font-size: 11.5px;
+    padding: 6px 8px;
+  }
+}

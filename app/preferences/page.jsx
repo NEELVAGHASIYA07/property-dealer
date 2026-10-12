@@ -13,6 +13,7 @@ import {
   Smartphone,
 } from "lucide-react";
 import "@/app/profile/profile.css";
+import SoftSandSelect from "@/app/components/SoftSandSelect";
 import { useAuth } from "@/app/context/AuthContext";
 
 const GUJARAT_CITIES = [
@@ -179,7 +180,7 @@ export default function PreferencesPage() {
                 <MapPin size={16} color="#ee705b" />
                 <span>Preferred Gujarat City</span>
               </label>
-              <select
+              <SoftSandSelect
                 className="pref-select"
                 value={prefCity}
                 onChange={(e) => setPrefCity(e.target.value)}
@@ -187,7 +188,7 @@ export default function PreferencesPage() {
                 {GUJARAT_CITIES.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
-              </select>
+              </SoftSandSelect>
             </div>
 
             <div className="pref-box">
@@ -195,7 +196,7 @@ export default function PreferencesPage() {
                 <Building2 size={16} color="#ee705b" />
                 <span>Preferred Property Type</span>
               </label>
-              <select
+              <SoftSandSelect
                 className="pref-select"
                 value={prefType}
                 onChange={(e) => setPrefType(e.target.value)}
@@ -205,7 +206,7 @@ export default function PreferencesPage() {
                 <option value="Apartment">Apartment / Flat</option>
                 <option value="Penthouse">Sky Penthouse</option>
                 <option value="Bungalow">Independent Bungalow</option>
-              </select>
+              </SoftSandSelect>
             </div>
 
             <div className="pref-box">
@@ -213,7 +214,7 @@ export default function PreferencesPage() {
                 <SlidersHorizontal size={16} color="#ee705b" />
                 <span>Target Budget Range</span>
               </label>
-              <select
+              <SoftSandSelect
                 className="pref-select"
                 value={prefBudget}
                 onChange={(e) => setPrefBudget(e.target.value)}
@@ -223,7 +224,7 @@ export default function PreferencesPage() {
                 <option value="1 Cr – 2.5 Cr">₹1 Crore – ₹2.5 Crore</option>
                 <option value="2.5 Cr – 5 Cr">₹2.5 Crore – ₹5 Crore</option>
                 <option value="5 Cr+">₹5 Crore+</option>
-              </select>
+              </SoftSandSelect>
             </div>
 
             {/* Instant Alerts Card */}

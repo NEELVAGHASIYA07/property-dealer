@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
+@import "./components/soft-sand-select.css";
 
 :root {
   --background: #f4f1eb;
@@ -875,13 +876,19 @@ h2 em {
   width: 100%;
 }
 .property-filters select {
-  background: var(--paper);
-  border: 2px solid var(--line);
-  border-radius: 8px;
+  background: #F5EFE7;
+  border: 1px solid #DFD2C2;
+  border-radius: 14px;
+  box-shadow: 0 6px 15px rgba(70, 58, 40, 0.08);
   min-height: 42px;
-  padding: 0 10px;
+  padding: 0 14px;
+  color: #2D2721;
 }
-.property-filters select:focus,
+.property-filters select:focus {
+  border-color: #C2B099;
+  background: #F5EFE7;
+  box-shadow: 0 8px 22px rgba(70, 58, 40, 0.12);
+}
 .filter-search:focus-within {
   border-color: var(--coral);
   box-shadow: 0 0 0 2px rgba(238, 112, 91, 0.16);
@@ -1287,30 +1294,28 @@ footer {
   width: 100%;
 }
 .hero-filter-select {
-  background: transparent;
-  border: 0;
-  color: #68665f;
+  background: #F5EFE7;
+  border: 1px solid #DFD2C2;
+  border-radius: 14px;
+  box-shadow: 0 6px 15px rgba(70, 58, 40, 0.08);
+  color: #2D2721;
   font-size: 14px;
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.2;
   outline: none;
-  padding: 0;
+  padding: 0 14px;
   text-align: left;
   width: 100%;
+  min-height: 44px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  transition: all 0.2s ease;
 }
 .hero-filter-select:focus,
 .hero-filter-select:focus-visible,
 .hero-filter-select:active {
-  outline: none !important;
-  box-shadow: none !important;
-}
-.hero-filter-select option {
-  background: #ffffff;
-  color: var(--ink);
-  font-size: 14px;
-  padding: 6px 10px;
+  border-color: #C2B099;
+  box-shadow: 0 8px 22px rgba(70, 58, 40, 0.12) !important;
 }
 .hero-filter-divider {
   align-self: center;

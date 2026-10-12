@@ -13,6 +13,7 @@ import {
 } from "@/app/lib/api";
 import InteractiveMapPicker from "@/app/components/InteractiveMapPicker";
 import PropertyDetailsDrawer from "./components/PropertyDetailsDrawer";
+import SoftSandSelect from "@/app/components/SoftSandSelect";
 import { FALLBACK_PROPERTIES } from "@/app/lib/propertiesData";
 import {
   searchLocation,
@@ -1790,7 +1791,7 @@ export default function AdminPage() {
                 </div>
 
                 {/* Mode Filter */}
-                <select
+                <SoftSandSelect
                   className="admin-filter-select"
                   value={modeFilter}
                   onChange={(e) => setModeFilter(e.target.value)}
@@ -1801,10 +1802,10 @@ export default function AdminPage() {
                   <option value="rent">Long-term Rentals</option>
                   <option value="short-term">Short-term Stays</option>
                   <option value="trending">⭐ Trending Listings Only</option>
-                </select>
+                </SoftSandSelect>
 
                 {/* City Filter */}
-                <select
+                <SoftSandSelect
                   className="admin-filter-select"
                   value={cityFilter}
                   onChange={(e) => setCityFilter(e.target.value)}
@@ -1814,10 +1815,10 @@ export default function AdminPage() {
                   {GUJARAT_CITIES.map((c) => (
                     <option key={c} value={c}>{c}</option>
                   ))}
-                </select>
+                </SoftSandSelect>
 
                 {/* Type Filter */}
-                <select
+                <SoftSandSelect
                   className="admin-filter-select"
                   value={typeFilter}
                   onChange={(e) => setTypeFilter(e.target.value)}
@@ -1827,12 +1828,12 @@ export default function AdminPage() {
                   {PROPERTY_TYPES.map((t) => (
                     <option key={t} value={t}>{t}</option>
                   ))}
-                </select>
+                </SoftSandSelect>
               </div>
 
               <div className="admin-toolbar-right">
                 {/* Sort dropdown */}
-                <select
+                <SoftSandSelect
                   className="admin-filter-select"
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
@@ -1841,7 +1842,7 @@ export default function AdminPage() {
                   <option value="newest">Sort: Newest Added</option>
                   <option value="price-high">Sort: Price (High to Low)</option>
                   <option value="price-low">Sort: Price (Low to High)</option>
-                </select>
+                </SoftSandSelect>
 
                 {/* View switcher */}
                 <div className="admin-view-toggle">
@@ -2193,7 +2194,7 @@ export default function AdminPage() {
                   <p className="admin-lead-msg">&ldquo;{lead.message}&rdquo;</p>
 
                   <div className="admin-lead-actions">
-                    <select
+                    <SoftSandSelect
                       className="admin-lead-status-select"
                       value={lead.status}
                       onChange={(e) => handleLeadStatusChange(lead.id, e.target.value)}
@@ -2203,7 +2204,7 @@ export default function AdminPage() {
                       <option value="Under Negotiation">🟣 Under Negotiation</option>
                       <option value="Deal Closed">🟢 Deal Closed / Won</option>
                       <option value="Cold / Dropped">⚪ Cold / Dropped</option>
-                    </select>
+                    </SoftSandSelect>
 
                     <div className="admin-lead-contact-btns">
                       <a href={`tel:${lead.phone}`} className="admin-lead-contact-btn call" title="Call Buyer">
@@ -2450,7 +2451,7 @@ export default function AdminPage() {
                       <label htmlFor="field-type-main">
                         <span>Property Type <span className="required-dot">*</span></span>
                       </label>
-                      <select
+                      <SoftSandSelect
                         id="field-type-main"
                         className="admin-saas-select"
                         value={formData.type}
@@ -2459,7 +2460,7 @@ export default function AdminPage() {
                         {PROPERTY_TYPES.map((t) => (
                           <option key={t} value={t}>{t}</option>
                         ))}
-                      </select>
+                      </SoftSandSelect>
                       <span className="admin-saas-subtext">Determines unit details & layout options below</span>
                     </div>
 
@@ -2482,7 +2483,7 @@ export default function AdminPage() {
                     {/* Listing Status */}
                     <div className="admin-saas-field">
                       <label htmlFor="field-status-main">Listing Status</label>
-                      <select
+                      <SoftSandSelect
                         id="field-status-main"
                         className="admin-saas-select"
                         value={formData.status}
@@ -2492,7 +2493,7 @@ export default function AdminPage() {
                         <option value="Draft">Draft (Internal Only)</option>
                         <option value="Under Review">Under Review</option>
                         <option value="Archived">Archived / Sold</option>
-                      </select>
+                      </SoftSandSelect>
                     </div>
 
                     {/* Subtitle / Tagline */}
@@ -2512,7 +2513,7 @@ export default function AdminPage() {
                     {/* Visibility */}
                     <div className="admin-saas-field">
                       <label htmlFor="field-visibility-select">Visibility</label>
-                      <select
+                      <SoftSandSelect
                         id="field-visibility-select"
                         className="admin-saas-select"
                         value={formData.visibility}
@@ -2521,7 +2522,7 @@ export default function AdminPage() {
                         <option value="Everyone">Everyone (Publicly Searchable)</option>
                         <option value="Registered Only">Registered Dealers & Buyers Only</option>
                         <option value="Private">Private / Direct Access Link</option>
-                      </select>
+                      </SoftSandSelect>
                     </div>
 
                     {/* ========================================================= */}
@@ -2663,7 +2664,7 @@ export default function AdminPage() {
 
                         <div className="admin-saas-field">
                           <label htmlFor="field-unit-stories">Stories / Levels</label>
-                          <select
+                          <SoftSandSelect
                             id="field-unit-stories"
                             className="admin-saas-select"
                             value={formData.stories}
@@ -2673,7 +2674,7 @@ export default function AdminPage() {
                             <option value="G+1 Floor">G+1 Floor (Duplex)</option>
                             <option value="G+2 Floors">G+2 Floors (Triplex)</option>
                             <option value="G+3 Floors">G+3 Floors</option>
-                          </select>
+                          </SoftSandSelect>
                           <span className="admin-saas-subtext">Elevation levels of the villa</span>
                         </div>
 
@@ -2748,7 +2749,7 @@ export default function AdminPage() {
                     {/* Bedrooms (BHK) */}
                     <div className="admin-saas-field">
                       <label htmlFor="field-common-bhk">Bedrooms (BHK)</label>
-                      <select
+                      <SoftSandSelect
                         id="field-common-bhk"
                         className="admin-saas-select"
                         value={formData.bedrooms}
@@ -2763,13 +2764,13 @@ export default function AdminPage() {
                         <option value="3">3 BHK / 3 Bed</option>
                         <option value="4">4 BHK / 4 Bed</option>
                         <option value="5">5+ BHK / 5 Bed</option>
-                      </select>
+                      </SoftSandSelect>
                     </div>
 
                     {/* Bathrooms */}
                     <div className="admin-saas-field">
                       <label htmlFor="field-common-bathrooms">Bathrooms</label>
-                      <select
+                      <SoftSandSelect
                         id="field-common-bathrooms"
                         className="admin-saas-select"
                         value={formData.bathrooms}
@@ -2780,13 +2781,13 @@ export default function AdminPage() {
                         <option value="3">3 Bathrooms</option>
                         <option value="4">4 Bathrooms</option>
                         <option value="5">5+ Bathrooms</option>
-                      </select>
+                      </SoftSandSelect>
                     </div>
 
                     {/* Balconies */}
                     <div className="admin-saas-field">
                       <label htmlFor="field-common-balconies">Balconies</label>
-                      <select
+                      <SoftSandSelect
                         id="field-common-balconies"
                         className="admin-saas-select"
                         value={formData.balconies}
@@ -2796,7 +2797,7 @@ export default function AdminPage() {
                         <option value="1">1 Balcony</option>
                         <option value="2">2 Balconies</option>
                         <option value="3">3+ Balconies</option>
-                      </select>
+                      </SoftSandSelect>
                     </div>
 
                     {/* Built-up Area */}
@@ -2816,7 +2817,7 @@ export default function AdminPage() {
                     {/* Furnishing */}
                     <div className="admin-saas-field">
                       <label htmlFor="field-common-furnishing">Furnishing Status</label>
-                      <select
+                      <SoftSandSelect
                         id="field-common-furnishing"
                         className="admin-saas-select"
                         value={formData.furnishing}
@@ -2825,7 +2826,7 @@ export default function AdminPage() {
                         <option value="Unfurnished">Unfurnished</option>
                         <option value="Semi-Furnished">Semi-Furnished</option>
                         <option value="Fully Furnished">Fully Furnished</option>
-                      </select>
+                      </SoftSandSelect>
                     </div>
 
                     {/* Floor */}
@@ -2844,7 +2845,7 @@ export default function AdminPage() {
                     {/* Parking */}
                     <div className="admin-saas-field">
                       <label htmlFor="field-common-parking">Dedicated Parking</label>
-                      <select
+                      <SoftSandSelect
                         id="field-common-parking"
                         className="admin-saas-select"
                         value={formData.parkingSlots}
@@ -2854,13 +2855,13 @@ export default function AdminPage() {
                         <option value="2 Covered Dedicated">2 Covered Parking</option>
                         <option value="Open Parking">Open Parking</option>
                         <option value="No Parking">No Parking</option>
-                      </select>
+                      </SoftSandSelect>
                     </div>
 
                     {/* Common Quality Features (For all properties) */}
                     <div className="admin-saas-field">
                       <label htmlFor="field-common-condition">Construction Condition / Age</label>
-                      <select
+                      <SoftSandSelect
                         id="field-common-condition"
                         className="admin-saas-select"
                         value={formData.moveInCondition}
@@ -2870,12 +2871,12 @@ export default function AdminPage() {
                         <option value="Under Construction">Under Construction</option>
                         <option value="Brand New Launch">Brand New Launch (Pre-Booking)</option>
                         <option value="Resale Ready">Resale Ready</option>
-                      </select>
+                      </SoftSandSelect>
                     </div>
 
                     <div className="admin-saas-field">
                       <label htmlFor="field-common-facing">Vastu / Facing Orientation</label>
-                      <select
+                      <SoftSandSelect
                         id="field-common-facing"
                         className="admin-saas-select"
                         value={formData.facing}
@@ -2886,12 +2887,12 @@ export default function AdminPage() {
                         <option value="North-East (Ishan Corner)">North-East Corner</option>
                         <option value="West Facing">West Facing</option>
                         <option value="South Facing">South Facing</option>
-                      </select>
+                      </SoftSandSelect>
                     </div>
 
                     <div className="admin-saas-field">
                       <label htmlFor="field-common-water">Water Supply System</label>
-                      <select
+                      <SoftSandSelect
                         id="field-common-water"
                         className="admin-saas-select"
                         value={formData.waterSupply}
@@ -2900,7 +2901,7 @@ export default function AdminPage() {
                         <option value="24/7 Municipal Corporation + Borewell">24/7 Municipal Corporation + Borewell</option>
                         <option value="Municipal Corporation Only">Municipal Corporation Connection Only</option>
                         <option value="Borewell + RO Water Treatment Plant">Borewell + RO Water Treatment Plant</option>
-                      </select>
+                      </SoftSandSelect>
                     </div>
 
                     <div className="admin-saas-field col-span-3">
@@ -3079,7 +3080,7 @@ export default function AdminPage() {
                   <div className="admin-saas-grid-3col">
                     <div className="admin-saas-field">
                       <label htmlFor="field-terms-mode">Listing Mode</label>
-                      <select
+                      <SoftSandSelect
                         id="field-terms-mode"
                         className="admin-saas-select"
                         value={formData.mode}
@@ -3088,13 +3089,13 @@ export default function AdminPage() {
                         <option value="buy">For Sale (Outright Purchase)</option>
                         <option value="rent">Rental (Monthly Lease)</option>
                         <option value="short-term">Short-term Stay (Per Night)</option>
-                      </select>
+                      </SoftSandSelect>
                       <span className="admin-saas-subtext">Determines contractual terms & pricing fee structures</span>
                     </div>
 
                     <div className="admin-saas-field">
                       <label htmlFor="field-terms-possession">Possession Timeline</label>
-                      <select
+                      <SoftSandSelect
                         id="field-terms-possession"
                         className="admin-saas-select"
                         value={formData.possessionTimeline}
@@ -3105,12 +3106,12 @@ export default function AdminPage() {
                         <option value="Under Construction (Possession in 6 Months)">Under Construction (Possession in 6 Months)</option>
                         <option value="Possession in 1 Year">Possession in 1 Year</option>
                         <option value="New Project Launch (2-3 Years)">New Project Launch (2-3 Years)</option>
-                      </select>
+                      </SoftSandSelect>
                     </div>
 
                     <div className="admin-saas-field">
                       <label htmlFor="field-terms-title">Ownership Title Status</label>
-                      <select
+                      <SoftSandSelect
                         id="field-terms-title"
                         className="admin-saas-select"
                         value={formData.ownershipTitle}
@@ -3120,12 +3121,12 @@ export default function AdminPage() {
                         <option value="Leasehold (99-Year Authority Lease)">Leasehold (99-Year Authority Lease)</option>
                         <option value="Co-operative Housing Society (Share Certificate)">Co-operative Housing Society (Share Certificate)</option>
                         <option value="Power of Attorney">Power of Attorney</option>
-                      </select>
+                      </SoftSandSelect>
                     </div>
 
                     <div className="admin-saas-field">
                       <label htmlFor="field-terms-rera-status">RERA Registration Status</label>
-                      <select
+                      <SoftSandSelect
                         id="field-terms-rera-status"
                         className="admin-saas-select"
                         value={formData.reraApproved}
@@ -3134,7 +3135,7 @@ export default function AdminPage() {
                         <option value="RERA Approved & Registered">RERA Approved & Registered</option>
                         <option value="RERA Applied / Registration in Progress">RERA Applied / Registration in Progress</option>
                         <option value="RERA Exempted (Completed prior to act)">RERA Exempted (Completed prior to act)</option>
-                      </select>
+                      </SoftSandSelect>
                     </div>
 
                     <div className="admin-saas-field col-span-2">
@@ -3152,7 +3153,7 @@ export default function AdminPage() {
 
                     <div className="admin-saas-field">
                       <label htmlFor="field-terms-negotiability">Price Negotiability</label>
-                      <select
+                      <SoftSandSelect
                         id="field-terms-negotiability"
                         className="admin-saas-select"
                         value={formData.priceNegotiability}
@@ -3161,7 +3162,7 @@ export default function AdminPage() {
                         <option value="Slightly Negotiable">Slightly Negotiable</option>
                         <option value="Fixed Price / Non-negotiable">Fixed Price / Non-negotiable</option>
                         <option value="Negotiable across the table for quick closing">Negotiable across the table for quick closing</option>
-                      </select>
+                      </SoftSandSelect>
                     </div>
 
                     <div className="admin-saas-field col-span-2">
@@ -3255,7 +3256,7 @@ export default function AdminPage() {
 
                         <div className="admin-saas-field">
                           <label htmlFor="field-buy-brokerage">Dealer Brokerage / Agency Fee</label>
-                          <select
+                          <SoftSandSelect
                             id="field-buy-brokerage"
                             className="admin-saas-select"
                             value={formData.brokerageCommission}
@@ -3264,7 +3265,7 @@ export default function AdminPage() {
                             <option value="1%">1% Standard Dealer Brokerage</option>
                             <option value="2%">2% Comprehensive Advisory Fee</option>
                             <option value="Zero Brokerage">Zero Brokerage (Builder Direct Deal)</option>
-                          </select>
+                          </SoftSandSelect>
                         </div>
 
                         <div className="admin-saas-field">
@@ -3374,7 +3375,7 @@ export default function AdminPage() {
 
                         <div className="admin-saas-field">
                           <label htmlFor="field-rent-lockin">Lock-in Period</label>
-                          <select
+                          <SoftSandSelect
                             id="field-rent-lockin"
                             className="admin-saas-select"
                             value={formData.lockinPeriod}
@@ -3384,12 +3385,12 @@ export default function AdminPage() {
                             <option value="11 Months">11 Months (Standard Registered Agreement)</option>
                             <option value="1 Year">1 Year</option>
                             <option value="2 Years">2 Years (Corporate Lease)</option>
-                          </select>
+                          </SoftSandSelect>
                         </div>
 
                         <div className="admin-saas-field">
                           <label htmlFor="field-rent-notice">Notice Period</label>
-                          <select
+                          <SoftSandSelect
                             id="field-rent-notice"
                             className="admin-saas-select"
                             value={formData.noticePeriod}
@@ -3398,7 +3399,7 @@ export default function AdminPage() {
                             <option value="1 Month">1 Month Notice</option>
                             <option value="2 Months">2 Months Notice</option>
                             <option value="3 Months">3 Months Notice</option>
-                          </select>
+                          </SoftSandSelect>
                         </div>
 
                         <div className="admin-saas-field">
@@ -3515,7 +3516,7 @@ export default function AdminPage() {
 
                         <div className="admin-saas-field">
                           <label htmlFor="field-st-cancel">Cancellation Policy</label>
-                          <select
+                          <SoftSandSelect
                             id="field-st-cancel"
                             className="admin-saas-select"
                             value={formData.cancellationPolicy}
@@ -3524,7 +3525,7 @@ export default function AdminPage() {
                             <option value="Flexible (Full refund up to 48 hours before check-in)">Flexible (Full refund up to 48 hours prior)</option>
                             <option value="Moderate (Full refund up to 5 days before check-in)">Moderate (Full refund up to 5 days prior)</option>
                             <option value="Strict (50% refund up to 7 days before check-in)">Strict (50% refund up to 7 days prior)</option>
-                          </select>
+                          </SoftSandSelect>
                         </div>
                       </>
                     )}
@@ -3559,14 +3560,14 @@ export default function AdminPage() {
                         <span>State <span className="required-dot">*</span></span>
                         <span style={{ fontSize: "11px", color: "#16a34a", fontWeight: "600" }}>Active Hub</span>
                       </label>
-                      <select
+                      <SoftSandSelect
                         id="field-loc-state"
                         className="admin-saas-select"
                         value={formData.state || "Gujarat"}
                         onChange={(e) => handleFormChange("state", e.target.value)}
                       >
                         <option value="Gujarat">Gujarat</option>
-                      </select>
+                      </SoftSandSelect>
                       <span className="admin-saas-subtext">Currently all properties belong to Gujarat State</span>
                     </div>
 
@@ -3576,17 +3577,16 @@ export default function AdminPage() {
                         <span>City (Gujarat) <span className="required-dot">*</span></span>
                         <span style={{ fontSize: "11px", color: "#ee705b", fontWeight: "600" }}>Select City</span>
                       </label>
-                      <select
+                      <SoftSandSelect
                         id="field-loc-city"
                         className="admin-saas-select"
-                        style={{ border: "1.5px solid #ee705b", background: "#fffaf9" }}
                         value={formData.city}
                         onChange={(e) => handleCityChange(e.target.value)}
                       >
                         {GUJARAT_CITIES.map((c) => (
                           <option key={c} value={c}>{c}</option>
                         ))}
-                      </select>
+                      </SoftSandSelect>
                       <span className="admin-saas-subtext">Ahmedabad, Surat, Vadodara, Rajkot, Gandhinagar, etc.</span>
                     </div>
 
@@ -4033,7 +4033,7 @@ export default function AdminPage() {
                       {/* Dealer Type */}
                       <div className="admin-saas-field">
                         <label htmlFor="field-dealer-type">Dealer Type</label>
-                        <select
+                        <SoftSandSelect
                           id="field-dealer-type"
                           className="admin-saas-select"
                           value={formData.dealerType}
@@ -4045,7 +4045,7 @@ export default function AdminPage() {
                           <option value="Builder / Developer Representative">Builder / Developer Representative</option>
                           <option value="Certified Gujarat Broker">Certified Gujarat Broker</option>
                           <option value="Exclusive Luxury Partner">Exclusive Luxury Partner</option>
-                        </select>
+                        </SoftSandSelect>
                         <span className="admin-saas-subtext">Consultancy classification</span>
                       </div>
 
@@ -4066,7 +4066,7 @@ export default function AdminPage() {
                       {/* Verification Status */}
                       <div className="admin-saas-field">
                         <label htmlFor="field-dealer-status">Verification Status</label>
-                        <select
+                        <SoftSandSelect
                           id="field-dealer-status"
                           className="admin-saas-select"
                           value={formData.dealerStatus}
@@ -4076,7 +4076,7 @@ export default function AdminPage() {
                           <option value="Pending Review">Pending Review</option>
                           <option value="Top Rated Gujarat Dealer">Top Rated Gujarat Dealer</option>
                           <option value="Gold Partner">Gold Partner</option>
-                        </select>
+                        </SoftSandSelect>
                         <span className="admin-saas-subtext">Authority badge displayed on profile</span>
                       </div>
 
@@ -4203,7 +4203,7 @@ export default function AdminPage() {
                     <label style={{ fontSize: "12px", fontWeight: "600", color: "#44403c", display: "block", marginBottom: "4px" }}>
                       Property of Interest
                     </label>
-                    <select
+                    <SoftSandSelect
                       className="admin-form-select"
                       value={newLeadData.property}
                       onChange={(e) => setNewLeadData({ ...newLeadData, property: e.target.value })}
@@ -4214,7 +4214,7 @@ export default function AdminPage() {
                           {p.name} ({p.city} · {p.priceLabel})
                         </option>
                       ))}
-                    </select>
+                    </SoftSandSelect>
                   </div>
 
                   <div>

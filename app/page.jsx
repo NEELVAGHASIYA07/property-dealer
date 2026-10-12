@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Search, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, MapPin, Flame } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import SoftSandSelect from "@/app/components/SoftSandSelect";
 import { getTrendingProperties, getCities } from "@/app/lib/api";
 
 const cities = [
@@ -345,7 +346,7 @@ export default function HomePage() {
 							{/* City */}
 							<div className="hero-filter-field">
 								<label className="hero-filter-label" htmlFor="hero-city">Location</label>
-								<select
+								<SoftSandSelect
 									id="hero-city"
 									className="hero-filter-select"
 									value={city}
@@ -356,7 +357,7 @@ export default function HomePage() {
 									{cities.map((c) => (
 										<option key={c} value={c}>{c}</option>
 									))}
-								</select>
+								</SoftSandSelect>
 							</div>
 
 							<div className="hero-filter-divider" aria-hidden="true" />
@@ -364,7 +365,7 @@ export default function HomePage() {
 							{/* Bedrooms */}
 							<div className="hero-filter-field">
 								<label className="hero-filter-label" htmlFor="hero-bedrooms">Bedrooms</label>
-								<select
+								<SoftSandSelect
 									id="hero-bedrooms"
 									className="hero-filter-select"
 									value={bedrooms}
@@ -376,7 +377,7 @@ export default function HomePage() {
 									<option value="2">2 bedrooms</option>
 									<option value="3">3 bedrooms</option>
 									<option value="4">4+ bedrooms</option>
-								</select>
+								</SoftSandSelect>
 							</div>
 
 							<div className="hero-filter-divider" aria-hidden="true" />
@@ -386,7 +387,7 @@ export default function HomePage() {
 								<label className="hero-filter-label" htmlFor="hero-price">
 									{activeMode === "buy" ? "Budget" : activeMode === "rent" ? "Rent" : "Price"}
 								</label>
-								<select
+								<SoftSandSelect
 									id="hero-price"
 									className="hero-filter-select"
 									value={price}
@@ -396,7 +397,7 @@ export default function HomePage() {
 									{priceOptions.map((opt) => (
 										<option key={opt.value} value={opt.value}>{opt.label}</option>
 									))}
-								</select>
+								</SoftSandSelect>
 							</div>
 
 							{/* Search Button */}
