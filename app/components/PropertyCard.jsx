@@ -30,25 +30,35 @@ export default function PropertyCard({
   const { requireAuth } = useAuth();
   const [isSaved, setIsSaved] = useState(false);
   const [currentImgIdx, setCurrentImgIdx] = useState(0);
+  const [imgLoaded, setImgLoaded] = useState(false);
 
-  const images = getPropertyImages(property);
+  const images = getPropertyImages(property).slice(0, 5);
   const activeImg = images[currentImgIdx] || property.image;
+
+  // Reset carousel index & loaded state when the property changes (e.g. after filter)
+  useEffect(() => {
+    setCurrentImgIdx(0);
+    setImgLoaded(false);
+  }, [property.id]);
 
   const handlePrevImage = (e) => {
     e.stopPropagation();
     e.preventDefault();
+    setImgLoaded(false);
     setCurrentImgIdx((prev) => (prev - 1 + images.length) % images.length);
   };
 
   const handleNextImage = (e) => {
     e.stopPropagation();
     e.preventDefault();
+    setImgLoaded(false);
     setCurrentImgIdx((prev) => (prev + 1) % images.length);
   };
 
   const handleDotClick = (e, idx) => {
     e.stopPropagation();
     e.preventDefault();
+    setImgLoaded(false);
     setCurrentImgIdx(idx);
   };
 
@@ -127,7 +137,7 @@ export default function PropertyCard({
       onClick={handleCardClick}
     >
       {/* Property Image & Badges */}
-      <div className="property-card-image-wrap">
+      <div className={`property-card-image-wrap${imgLoaded ? " img-loaded" : ""}`}>
         <Link
           href={propertyUrl}
           target="_blank"
@@ -138,8 +148,9 @@ export default function PropertyCard({
           <img
             src={activeImg}
             alt={`${property.name} - Photo ${currentImgIdx + 1}`}
-            className="property-card-img"
+            className={`property-card-img${imgLoaded ? " img-visible" : ""}`}
             loading="lazy"
+            onLoad={() => setImgLoaded(true)}
           />
         </Link>
 

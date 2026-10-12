@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, Suspense } from "react";
+import { useState, useEffect, useMemo, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import PropertyCard from "@/app/components/PropertyCard";
 import PropertyMap from "@/app/components/PropertyMap";
@@ -385,7 +385,7 @@ function PropertyListingContent({ mode = "buy" }) {
   ]);
 
   // Handle map pin selection: scrolls corresponding card into view on left with full photo visible
-  const handleMapPinSelect = (id) => {
+  const handleMapPinSelect = useCallback((id) => {
     setSelectedPropertyId(id);
     const cardEl = document.getElementById(`property-card-${id}`);
     if (cardEl) {
@@ -416,16 +416,16 @@ function PropertyListingContent({ mode = "buy" }) {
         });
       }
     }
-  };
+  }, []);
 
   // Handle card hover & leave (only highlight when hovering!)
-  const handleCardHover = (id) => {
+  const handleCardHover = useCallback((id) => {
     setSelectedPropertyId(id);
-  };
+  }, []);
 
-  const handleCardLeave = () => {
+  const handleCardLeave = useCallback(() => {
     setSelectedPropertyId(null);
-  };
+  }, []);
 
   // Reset all filters
   const handleResetFilters = () => {

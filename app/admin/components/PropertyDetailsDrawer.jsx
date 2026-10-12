@@ -98,36 +98,37 @@ export default function PropertyDetailsDrawer({
     property.streetAddress ||
     property.address ||
     fallback?.streetAddress ||
-    `${area}, Near VIP Road, ${city}`;
+    fallback?.location ||
+    property.location ||
+    "—";
 
   const society =
     property.society ||
     property.project ||
     fallback?.society ||
-    `${property.name.replace(/Villa|Apartment|Residence|Penthouse/gi, "").trim()} Residency` ||
-    "Green Valley Residency";
+    "—";
 
   const wing =
     property.wing ||
     fallback?.unitDetails?.wing ||
-    (property.type === "Villa" ? "Villa Enclave" : "Wing A");
+    "—";
 
   const floor =
     property.floor ||
     fallback?.unitDetails?.floor ||
-    (property.type === "Villa" ? "Ground + 1" : "5");
+    "—";
 
   const flatNo =
     property.flatNo ||
     property.plotNo ||
     property.villaNo ||
     fallback?.unitDetails?.flatNo ||
-    (property.type === "Villa" ? "Villa No. 4" : "502");
+    "—";
 
   const surveyNo =
     property.surveyNo ||
     fallback?.unitDetails?.surveyNo ||
-    `S.No ${100 + (Number(property.id) || 12)}/A`;
+    "—";
 
   // Coordinates & Pin Link
   const coords = resolvePropertyCoordinates({
@@ -298,19 +299,19 @@ export default function PropertyDetailsDrawer({
               <div className="prop-drawer-row">
                 <span className="prop-drawer-label">Super Built-up Area</span>
                 <span className="prop-drawer-value">
-                  {property.size ? `${property.size} sq.ft.` : "1850 sq.ft."}
+                  {property.size ? `${property.size} sq.ft.` : "—"}
                 </span>
               </div>
               <div className="prop-drawer-row">
                 <span className="prop-drawer-label">Bedrooms (BHK)</span>
                 <span className="prop-drawer-value">
-                  {property.bedrooms ? `${property.bedrooms} BHK` : "3 BHK"}
+                  {property.bedrooms ? `${property.bedrooms} BHK` : "—"}
                 </span>
               </div>
               <div className="prop-drawer-row">
                 <span className="prop-drawer-label">Bathrooms</span>
                 <span className="prop-drawer-value">
-                  {property.bathrooms ? `${property.bathrooms} Bathrooms` : "3 Bathrooms"}
+                  {property.bathrooms ? `${property.bathrooms} Bathrooms` : "—"}
                 </span>
               </div>
               {property.tag && (

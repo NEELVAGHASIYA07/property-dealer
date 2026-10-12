@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import {
   User,
   LogOut,
@@ -35,6 +35,14 @@ const syncUserCookie = (u) => {
   }
 };
 
+const NAV_ITEMS = [
+  { label: "Home", href: "/" },
+  { label: "Buy", href: "/buy" },
+  { label: "Rent", href: "/rent" },
+  { label: "Short-term", href: "/short-term" },
+  { label: "Journal", href: "/blog" },
+];
+
 export default function Navbar({ initialUser = null }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -46,7 +54,7 @@ export default function Navbar({ initialUser = null }) {
       try {
         const saved = localStorage.getItem("fieldhouse_user");
         if (saved) return JSON.parse(saved);
-      } catch (e) { }
+      } catch (e) {}
     }
     return null;
   });
@@ -68,13 +76,74 @@ export default function Navbar({ initialUser = null }) {
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [adminTab, setAdminTab] = useState("properties");
+  const [isScrolled, setIsScrolled] = useState(false);
   const dropdownRef = useRef(null);
+  const navCapsuleRef = useRef(null);
+  const itemRefs = useRef({});
+
+  const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 });
 
   const isAdminRoute = pathname?.startsWith("/admin");
 
+  // Determine current active navigation item
+  const currentItem = useMemo(() => {
+    if (!pathname) return NAV_ITEMS[0];
+    if (pathname === "/") return NAV_ITEMS[0];
+    return NAV_ITEMS.slice(1).find((item) => pathname.startsWith(item.href)) || null;
+  }, [pathname]);
+
+  // Measure and align sliding indicator pill
+  const updateIndicator = useCallback(() => {
+    if (!currentItem || !navCapsuleRef.current) {
+      setIndicatorStyle((prev) => ({ ...prev, opacity: 0 }));
+      return;
+    }
+    const targetEl = itemRefs.current[currentItem.href];
+    const containerEl = navCapsuleRef.current;
+    if (targetEl && containerEl) {
+      const containerRect = containerEl.getBoundingClientRect();
+      const targetRect = targetEl.getBoundingClientRect();
+      setIndicatorStyle({
+        left: targetRect.left - containerRect.left,
+        width: targetRect.width,
+        opacity: 1,
+      });
+    } else {
+      setIndicatorStyle((prev) => ({ ...prev, opacity: 0 }));
+    }
+  }, [currentItem]);
+
+  useEffect(() => {
+    updateIndicator();
+    const raf = requestAnimationFrame(updateIndicator);
+    const timer = setTimeout(updateIndicator, 60);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(timer);
+    };
+  }, [updateIndicator]);
+
+  useEffect(() => {
+    const handleResize = () => updateIndicator();
+    window.addEventListener("resize", handleResize);
+    if (typeof document !== "undefined" && document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(updateIndicator);
+    }
+    return () => window.removeEventListener("resize", handleResize);
+  }, [updateIndicator]);
+
+  // Track window scroll for subtle elevation and backdrop blur
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   // Sync user state from localStorage and cookie
-  const loadUser = () => {
+  const loadUser = useCallback(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("fieldhouse_user");
       if (saved) {
@@ -99,15 +168,13 @@ export default function Navbar({ initialUser = null }) {
       setIsDealer(false);
       syncUserCookie(null);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadUser();
-
-    // Listen for storage events (login / logout across tabs / components)
     window.addEventListener("storage", loadUser);
     return () => window.removeEventListener("storage", loadUser);
-  }, [pathname]);
+  }, [pathname, loadUser]);
 
   // Close mobile menu and dropdown on page route change
   useEffect(() => {
@@ -126,24 +193,6 @@ export default function Navbar({ initialUser = null }) {
       document.body.style.overflow = "";
     };
   }, [isMobileMenuOpen]);
-
-  // Listen for admin tab active broadcasts from the admin page
-  useEffect(() => {
-    const handleTabActive = (e) => {
-      if (e.detail) setAdminTab(e.detail);
-    };
-    window.addEventListener("fieldhouse_admin_tab_active", handleTabActive);
-    return () => window.removeEventListener("fieldhouse_admin_tab_active", handleTabActive);
-  }, []);
-
-  // Sync admin tab on mount from URL
-  useEffect(() => {
-    if (typeof window !== "undefined" && isAdminRoute) {
-      const p = new URLSearchParams(window.location.search);
-      const t = p.get("tab");
-      if (t) setAdminTab(t);
-    }
-  }, [isAdminRoute]);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -171,195 +220,197 @@ export default function Navbar({ initialUser = null }) {
 
   const isCurrent = (path) => {
     if (path === "/") return pathname === "/";
-    return pathname.startsWith(path);
+    return pathname?.startsWith(path);
   };
 
-  // Remove consumer navbar completely on admin route as requested
+  // Remove consumer navbar completely on admin route
   if (isAdminRoute) {
     return null;
   }
 
-  // =========================================================================
-  // PUBLIC CONSUMER NAVBAR (Home, Buy, Rent, Short-term, Journal)
-  // =========================================================================
   return (
-    <nav className="topbar">
-      {/* Brand Logo */}
-      <Link className="brand" href="/" onClick={() => setIsMobileMenuOpen(false)}>
-        <span className="brand-mark">F</span>
-        <span className="brand-name">FIELDHOUSE</span>
-      </Link>
-
-      {/* Main Navigation Links (Desktop: >= 1024px; Tablet: >= 768px) */}
-      <div className="nav-links">
-        <Link className={isCurrent("/") ? "current" : ""} href="/">
-          Home
-        </Link>
-        <Link className={isCurrent("/buy") ? "current" : ""} href="/buy">
-          Buy
-        </Link>
-        <Link className={isCurrent("/rent") ? "current" : ""} href="/rent">
-          Rent
-        </Link>
-        <Link className={isCurrent("/short-term") ? "current" : ""} href="/short-term">
-          Short-term
-        </Link>
-        <Link className={isCurrent("/blog") ? "current" : ""} href="/blog">
-          Journal
+    <nav className={`topbar${isScrolled ? " scrolled" : ""}`}>
+      {/* ── LEFT COLUMN: Brand Logo ────────────────────────── */}
+      <div className="nav-brand-col">
+        <Link className="brand" href="/" onClick={() => setIsMobileMenuOpen(false)}>
+          <span className="brand-mark">F</span>
+          <span className="brand-name">FIELDHOUSE</span>
         </Link>
       </div>
 
-      {/* Right Corner: Clean Account Button & Hamburger */}
-      <div className="nav-actions-wrap" suppressHydrationWarning>
-        {user ? (
-          <div className="account-dropdown-wrap" ref={dropdownRef} suppressHydrationWarning>
+      {/* ── CENTER COLUMN: Premium Luxury Capsule Navigation ── */}
+      <div className="nav-capsule-col">
+        <div className="nav-capsule" ref={navCapsuleRef} role="navigation" aria-label="Main navigation">
+          {/* Animated Sliding Pill Indicator */}
+          <span
+            className="nav-capsule-indicator"
+            style={{
+              transform: `translateX(${indicatorStyle.left}px)`,
+              width: `${indicatorStyle.width}px`,
+              opacity: indicatorStyle.opacity,
+            }}
+            aria-hidden="true"
+          />
+
+          {NAV_ITEMS.map(({ label, href }) => {
+            const active = currentItem?.href === href;
+            return (
+              <Link
+                key={href}
+                ref={(el) => {
+                  if (el) itemRefs.current[href] = el;
+                }}
+                href={href}
+                className={`nav-capsule-link${active ? " current" : ""}`}
+                aria-current={active ? "page" : undefined}
+              >
+                {label}
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── RIGHT COLUMN: Luxury Profile Capsule & Mobile Toggle ── */}
+      <div className="nav-actions-col">
+        <div className="nav-actions-wrap" suppressHydrationWarning>
+          {user ? (
+            <div className="account-dropdown-wrap" ref={dropdownRef} suppressHydrationWarning>
+              <button
+                type="button"
+                className={`account-button${isDropdownOpen ? " is-open" : ""}${isCurrent("/profile") || isCurrent("/login") || isCurrent("/admin") ? " active" : ""}`}
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                id="nav-my-account"
+                aria-label="My account"
+                aria-expanded={isDropdownOpen}
+                suppressHydrationWarning
+              >
+                <div className={`account-btn-avatar ${isDealer ? "dealer" : ""}`}>
+                  {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                </div>
+                <span className="account-btn-label">
+                  {user.name ? user.name.split(" ")[0].toUpperCase() : "ACCOUNT"}
+                </span>
+                <ChevronDown
+                  size={13}
+                  className={`account-btn-chevron${isDropdownOpen ? " rotated" : ""}`}
+                />
+              </button>
+
+              {isDropdownOpen && (
+                <div className="account-dropdown-menu">
+                  {/* Header with Avatar & Details */}
+                  <div className="account-dropdown-header">
+                    <div className={`account-dropdown-avatar ${isDealer ? "dealer" : ""}`}>
+                      {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+                    </div>
+                    <div className="account-dropdown-meta">
+                      <div className="account-dropdown-name">{user?.name || "Account User"}</div>
+                      <div className="account-dropdown-email">{user?.email}</div>
+                      <span className={`account-dropdown-role-badge ${isDealer ? "admin" : "client"}`}>
+                        <ShieldCheck size={11} />
+                        <span>{isDealer ? "Verified Dealer" : "Verified Client"}</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Navigation Links */}
+                  <div className="account-dropdown-links">
+                    {isDealer && (
+                      <Link
+                        href="/admin"
+                        className="account-dropdown-item featured"
+                        onClick={() => setIsDropdownOpen(false)}
+                        style={{
+                          background: "rgba(238, 112, 91, 0.08)",
+                          color: "#ee705b",
+                          fontWeight: "700",
+                        }}
+                      >
+                        <LayoutDashboard size={15} />
+                        <span>Admin & Dealer Console</span>
+                      </Link>
+                    )}
+
+                    <Link
+                      href="/profile"
+                      className="account-dropdown-item"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      <User size={15} />
+                      <span>My Account Profile</span>
+                    </Link>
+
+                    <Link
+                      href="/saved-homes"
+                      className="account-dropdown-item"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      <Heart size={15} />
+                      <span>Saved Homes</span>
+                    </Link>
+
+                    <Link
+                      href="/inquiries"
+                      className="account-dropdown-item"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      <CalendarDays size={15} />
+                      <span>My Inquiries & Tours</span>
+                    </Link>
+
+                    <Link
+                      href="/preferences"
+                      className="account-dropdown-item"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      <SlidersHorizontal size={15} />
+                      <span>Search Alerts & Preferences</span>
+                    </Link>
+                  </div>
+
+                  {/* Sign Out Button */}
+                  <button
+                    type="button"
+                    className="account-dropdown-logout-btn"
+                    onClick={handleLogout}
+                  >
+                    <LogOut size={14} />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
             <button
               type="button"
-              className={`account-button${isCurrent("/profile") || isCurrent("/login") || isCurrent("/admin") ? " active" : ""}`}
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="account-button unauth"
+              onClick={() => openAuthModal({
+                title: "Welcome to Fieldhouse",
+                subtitle: "Sign in or create an account to access exclusive Gujarat luxury listings."
+              })}
               id="nav-my-account"
               aria-label="My account"
-              aria-expanded={isDropdownOpen}
-              suppressHydrationWarning
             >
-              <div
-                style={{
-                  width: "22px",
-                  height: "22px",
-                  borderRadius: "50%",
-                  background: isDealer ? "#ee705b" : "#1d1e1a",
-                  color: "#ffffff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "11px",
-                  fontWeight: "800",
-                  flexShrink: 0,
-                }}
-              >
-                {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+              <div className="account-btn-avatar">
+                <User size={13} strokeWidth={2.4} style={{ color: "#ee705b" }} />
               </div>
-              <span className="account-btn-label">{user.name ? user.name.split(" ")[0] : "Account"}</span>
-              <ChevronDown
-                size={13}
-                style={{
-                  transform: isDropdownOpen ? "rotate(180deg)" : "none",
-                  transition: "transform 0.2s",
-                }}
-              />
+              <span className="account-btn-label">SIGN IN</span>
             </button>
+          )}
 
-            {isDropdownOpen && (
-              <div className="account-dropdown-menu">
-                {/* Header with Avatar & Details */}
-                <div className="account-dropdown-header">
-                  <div className={`account-dropdown-avatar ${isDealer ? "dealer" : ""}`}>
-                    {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
-                  </div>
-                  <div className="account-dropdown-meta">
-                    <div className="account-dropdown-name">{user?.name || "Account User"}</div>
-                    <div className="account-dropdown-email">{user?.email}</div>
-                    <span className={`account-dropdown-role-badge ${isDealer ? "admin" : "client"}`}>
-                      <ShieldCheck size={11} />
-                      <span>{isDealer ? "Verified Dealer" : "Verified Client"}</span>
-                    </span>
-                  </div>
-                </div>
-
-                {/* Navigation Links */}
-                <div className="account-dropdown-links">
-                  {isDealer && (
-                    <Link
-                      href="/admin"
-                      className="account-dropdown-item featured"
-                      onClick={() => setIsDropdownOpen(false)}
-                      style={{
-                        background: "rgba(238, 112, 91, 0.08)",
-                        color: "#ee705b",
-                        fontWeight: "700",
-                      }}
-                    >
-                      <LayoutDashboard size={15} />
-                      <span>Admin & Dealer Console</span>
-                    </Link>
-                  )}
-
-                  <Link
-                    href="/profile"
-                    className="account-dropdown-item"
-                    onClick={() => setIsDropdownOpen(false)}
-                  >
-                    <User size={15} />
-                    <span>My Account Profile</span>
-                  </Link>
-
-                  <Link
-                    href="/saved-homes"
-                    className="account-dropdown-item"
-                    onClick={() => setIsDropdownOpen(false)}
-                  >
-                    <Heart size={15} />
-                    <span>Saved Homes</span>
-                  </Link>
-
-                  <Link
-                    href="/inquiries"
-                    className="account-dropdown-item"
-                    onClick={() => setIsDropdownOpen(false)}
-                  >
-                    <CalendarDays size={15} />
-                    <span>My Inquiries & Tours</span>
-                  </Link>
-
-                  <Link
-                    href="/preferences"
-                    className="account-dropdown-item"
-                    onClick={() => setIsDropdownOpen(false)}
-                  >
-                    <SlidersHorizontal size={15} />
-                    <span>Search Alerts & Preferences</span>
-                  </Link>
-                </div>
-
-                {/* Sign Out Button */}
-                <button
-                  type="button"
-                  className="account-dropdown-logout-btn"
-                  onClick={handleLogout}
-                >
-                  <LogOut size={14} />
-                  <span>Sign Out</span>
-                </button>
-              </div>
-            )}
-          </div>
-        ) : (
+          {/* Responsive Mobile Menu Toggle Button */}
           <button
             type="button"
-            className="account-button"
-            onClick={() => openAuthModal({
-              title: "Welcome to Fieldhouse",
-              subtitle: "Sign in or create an account to access exclusive Gujarat luxury listings."
-            })}
-            id="nav-my-account"
-            aria-label="My account"
+            className="mobile-nav-toggle-btn"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open navigation menu"}
+            aria-expanded={isMobileMenuOpen}
+            id="nav-mobile-hamburger"
           >
-            <User size={15} strokeWidth={2.2} />
-            <span className="account-btn-label">My account</span>
+            {isMobileMenuOpen ? <X size={20} strokeWidth={2.2} /> : <Menu size={20} strokeWidth={2.2} />}
           </button>
-        )}
-
-        {/* Responsive Mobile Menu Toggle Button */}
-        <button
-          type="button"
-          className="mobile-nav-toggle-btn"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label={isMobileMenuOpen ? "Close menu" : "Open navigation menu"}
-          aria-expanded={isMobileMenuOpen}
-          id="nav-mobile-hamburger"
-        >
-          {isMobileMenuOpen ? <X size={20} strokeWidth={2.2} /> : <Menu size={20} strokeWidth={2.2} />}
-        </button>
+        </div>
       </div>
 
       {/* Mobile Navigation Backdrop */}
@@ -452,7 +503,7 @@ export default function Navbar({ initialUser = null }) {
                     width: "36px",
                     height: "36px",
                     borderRadius: "50%",
-                    background: isDealer ? "#ee705b" : "#1d1e1a",
+                    background: isDealer ? "#ee705b" : "#24231F",
                     color: "#ffffff",
                     display: "flex",
                     alignItems: "center",

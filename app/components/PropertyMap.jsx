@@ -101,8 +101,13 @@ export default function PropertyMap({
   const mapInstanceRef = useRef(null);
   const tileLayerRef = useRef(null);
   const markersRef = useRef({});
+  const onSelectPropertyRef = useRef(onSelectProperty);
   const [mapType, setMapType] = useState("google"); // 'google' | 'satellite' | 'osm'
   const [mapReady, setMapReady] = useState(false);
+
+  useEffect(() => {
+    onSelectPropertyRef.current = onSelectProperty;
+  }, [onSelectProperty]);
 
   // Initialize Leaflet Map once
   useEffect(() => {
@@ -256,18 +261,31 @@ export default function PropertyMap({
     const L = window.L;
     const map = mapInstanceRef.current;
 
-    // Clear existing markers
-    Object.values(markersRef.current).forEach((m) => {
-      try {
-        m.remove();
-      } catch (e) { }
-    });
-    markersRef.current = {};
+    if (!properties || properties.length === 0) {
+      // Clear existing markers if no properties
+      Object.values(markersRef.current).forEach((m) => {
+        try {
+          m.remove();
+        } catch (e) { }
+      });
+      markersRef.current = {};
+      return;
+    }
 
-    if (!properties || properties.length === 0) return;
-
-    // Function to calculate accurate positions and place/update pins
+    // Function to calculate accurate positions and place/update pins with diffing
     const renderMarkers = () => {
+      const currentIds = new Set(properties.map((p) => String(p.id)));
+
+      // Remove markers that are no longer present
+      Object.entries(markersRef.current).forEach(([id, m]) => {
+        if (!currentIds.has(id)) {
+          try {
+            m.remove();
+          } catch (e) { }
+          delete markersRef.current[id];
+        }
+      });
+
       const resolvedProps = resolveAccurateMarkerPositions(properties, L);
 
       resolvedProps.forEach((prop) => {
@@ -349,8 +367,8 @@ export default function PropertyMap({
 
           // Pin Click Synchronizes with Left Cards
           marker.on("click", () => {
-            if (onSelectProperty) {
-              onSelectProperty(prop.id);
+            if (onSelectPropertyRef.current) {
+              onSelectPropertyRef.current(prop.id);
             }
           });
 
@@ -452,23 +470,41 @@ export default function PropertyMap({
   }, [selectedPropertyId, mapReady, properties]);
 
   // Reset view to encompass all current properties
-  const handleResetView = () => {
+  const handleResetView = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (!mapInstanceRef.current) return;
+    const map = mapInstanceRef.current;
     const bounds = properties
-      .filter((p) => p.lat && p.lng && !isNaN(p.lat) && !isNaN(p.lng))
+      .filter((p) => p.lat && p.lng && !isNaN(Number(p.lat)) && !isNaN(Number(p.lng)))
       .map((p) => [Number(p.lat), Number(p.lng)]);
 
-    if (bounds.length > 1) {
-      mapInstanceRef.current.fitBounds(bounds, {
-        paddingTopLeft: [70, 85],
-        paddingBottomRight: [70, 65],
-        maxZoom: 13,
-      });
-    } else if (bounds.length === 1) {
-      mapInstanceRef.current.setView(bounds[0], 13);
-    } else {
-      const defaultCoord = GUJARAT_CITY_COORDS[centerCity] || GUJARAT_CITY_COORDS.Surat;
-      mapInstanceRef.current.setView([defaultCoord.lat, defaultCoord.lng], 12);
+    try {
+      if (bounds.length > 1) {
+        map.fitBounds(bounds, {
+          paddingTopLeft: [70, 85],
+          paddingBottomRight: [70, 65],
+          maxZoom: 13,
+          animate: true,
+        });
+      } else if (bounds.length === 1) {
+        map.setView(bounds[0], 13, { animate: true });
+      } else {
+        const defaultCoord = GUJARAT_CITY_COORDS[centerCity] || GUJARAT_CITY_COORDS.Surat;
+        map.setView([defaultCoord.lat, defaultCoord.lng], 12, { animate: true });
+      }
+      // Force size recalculation in case of layout shifts
+      setTimeout(() => {
+        if (mapInstanceRef.current) mapInstanceRef.current.invalidateSize();
+      }, 200);
+    } catch (err) {
+      console.warn("Reset map view error:", err);
+      try {
+        const defaultCoord = GUJARAT_CITY_COORDS[centerCity] || GUJARAT_CITY_COORDS.Surat;
+        map.setView([defaultCoord.lat, defaultCoord.lng], 12);
+      } catch (e2) {}
     }
   };
 

@@ -5,6 +5,7 @@ import { Search, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, MapPin, Flam
 import { useState, useRef, useEffect } from "react";
 import SoftSandSelect from "@/app/components/SoftSandSelect";
 import { getTrendingProperties, getCities } from "@/app/lib/api";
+import { FALLBACK_PROPERTIES } from "@/app/lib/propertiesData";
 
 const cities = [
 	"Ahmedabad", "Surat", "Vadodara", "Rajkot", "Gandhinagar",
@@ -39,120 +40,6 @@ const PRICE_OPTIONS = {
 	],
 };
 
-const TRENDING_PROPERTIES = [
-	{
-		id: "trend-1",
-		name: "The Juniper Villa",
-		city: "Ahmedabad",
-		location: "Bodakdev, Ahmedabad",
-		price: "INR 2.48 Cr",
-		type: "Villa",
-		tag: "Trending",
-		bedrooms: 4,
-		bathrooms: 4,
-		area: "3,200 sq ft",
-		image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
-		link: "/property/trend-1"
-	},
-	{
-		id: "trend-2",
-		name: "Arcadia Sky Residence",
-		city: "Surat",
-		location: "Vesu, Surat",
-		price: "INR 1.75 Cr",
-		type: "Apartment",
-		tag: "Popular",
-		bedrooms: 3,
-		bathrooms: 3,
-		area: "2,150 sq ft",
-		image: "https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80",
-		link: "/property/trend-2"
-	},
-	{
-		id: "trend-3",
-		name: "Canyon Palm Estate",
-		city: "Vadodara",
-		location: "Alkapuri, Vadodara",
-		price: "INR 1.86 Cr",
-		type: "Bungalow",
-		tag: "Featured",
-		bedrooms: 4,
-		bathrooms: 3,
-		area: "2,600 sq ft",
-		image: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=800&q=80",
-		link: "/property/trend-3"
-	},
-	{
-		id: "trend-4",
-		name: "The Capital Heights",
-		city: "Gandhinagar",
-		location: "Kudasan, Gandhinagar",
-		price: "INR 3.10 Cr",
-		type: "Penthouse",
-		tag: "Trending",
-		bedrooms: 5,
-		bathrooms: 5,
-		area: "4,100 sq ft",
-		image: "https://images.unsplash.com/photo-1600573472556-e636c2acda88?auto=format&fit=crop&w=800&q=80",
-		link: "/property/trend-4"
-	},
-	{
-		id: "trend-5",
-		name: "Sapphire Haven",
-		city: "Rajkot",
-		location: "Kalawad Road, Rajkot",
-		price: "INR 85 L",
-		type: "Apartment",
-		tag: "Hot Deal",
-		bedrooms: 3,
-		bathrooms: 2,
-		area: "1,550 sq ft",
-		image: "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=800&q=80",
-		link: "/property/trend-5"
-	},
-	{
-		id: "trend-6",
-		name: "Marble Crest Manor",
-		city: "Bhavnagar",
-		location: "Victoria Park, Bhavnagar",
-		price: "INR 1.52 Cr",
-		type: "Bungalow",
-		tag: "Featured",
-		bedrooms: 4,
-		bathrooms: 3,
-		area: "2,400 sq ft",
-		image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80",
-		link: "/property/trend-6"
-	},
-	{
-		id: "trend-7",
-		name: "Riverside Courtyard",
-		city: "Ahmedabad",
-		location: "Ambli, Ahmedabad",
-		price: "INR 4.20 Cr",
-		type: "Villa",
-		tag: "Luxury",
-		bedrooms: 5,
-		bathrooms: 6,
-		area: "5,200 sq ft",
-		image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80",
-		link: "/property/trend-7"
-	},
-	{
-		id: "trend-8",
-		name: "Green Meadows Residence",
-		city: "Anand",
-		location: "Vidyanagar Road, Anand",
-		price: "INR 95 L",
-		type: "Row House",
-		tag: "Trending",
-		bedrooms: 3,
-		bathrooms: 3,
-		area: "1,850 sq ft",
-		image: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=800&q=80",
-		link: "/property/trend-8"
-	}
-];
 
 const GUJARAT_CITIES = [
 	{
@@ -265,7 +152,26 @@ export default function HomePage() {
 		setPrice(""); // reset price when mode changes
 	};
 
-	const [trendingProperties, setTrendingProperties] = useState(TRENDING_PROPERTIES);
+	// Use FALLBACK_PROPERTIES (buy mode only) as initial trending — single source of truth
+	const initialTrending = FALLBACK_PROPERTIES
+		.filter((p) => p.mode === "buy" && p.tag)
+		.slice(0, 8)
+		.map((p) => ({
+			id: p.id,
+			name: p.name,
+			city: p.city,
+			location: p.location || `${p.area}, ${p.city}`,
+			price: p.priceLabel,
+			type: p.type,
+			tag: p.tag,
+			bedrooms: p.bedrooms,
+			bathrooms: p.bathrooms,
+			area: p.size ? `${Number(p.size).toLocaleString()} sq ft` : "Spacious",
+			image: p.image,
+			link: `/property/${p.id}`,
+		}));
+
+	const [trendingProperties, setTrendingProperties] = useState(initialTrending);
 	const [gujaratCities, setGujaratCities] = useState(GUJARAT_CITIES);
 
 	useEffect(() => {
@@ -316,7 +222,7 @@ export default function HomePage() {
 		<main className="app-shell home-page">
 			<section className="home-hero">
 				<div>
-					<p className="eyebrow" style={{ color: "#ffff" }}>Independent real estate / Los Angeles</p>
+					<p className="eyebrow" style={{ color: "#ffff" }}>Independent real estate / Gujarat</p>
 					<h1>Find a place<br /><em>with a pulse.</em></h1>
 					<p className="hero-description">Thoughtful homes, considered advice, and a better way to move through the city.</p>
 
@@ -540,8 +446,12 @@ export default function HomePage() {
 			</section>
 			<footer>
 				<span>© 2026 Fieldhouse Realty</span>
-				<span>Los Angeles, CA</span>
-				<span>Instagram &nbsp; LinkedIn</span>
+				<span>Gujarat, India</span>
+				<span>
+					<a href="https://instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a>
+					&nbsp;&nbsp;·&nbsp;&nbsp;
+					<a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+				</span>
 			</footer>
 		</main>
 	);

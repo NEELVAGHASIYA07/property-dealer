@@ -39,7 +39,7 @@ import {
   Trash2,
   Edit3,
   ExternalLink,
-  DollarSign,
+  IndianRupee,
   Home,
   Users,
   MapPin,
@@ -340,18 +340,18 @@ export default function AdminPage() {
     state: "Gujarat",
     city: "Surat",
     area: "Vesu",
-    streetAddress: "VIP Road, Near Lake View Road",
-    address: "VIP Road, Near Lake View Road, Vesu, Surat",
-    landmark: "Near Lake View Road",
+    streetAddress: "",
+    address: "",
+    landmark: "",
     pincode: "395007",
-    society: "Shree Residency",
-    // Property Unit Details (Separated from Address!)
-    plotNo: "P-24",
-    surveyNo: "Survey 142/2",
-    wing: "A Wing",
-    floor: "5",
-    flatNo: "502",
-    villaNo: "Villa 12",
+    society: "",
+    // Property Unit Details (Clean defaults)
+    plotNo: "",
+    surveyNo: "",
+    wing: "",
+    floor: "",
+    flatNo: "",
+    villaNo: "",
     isLocationConfirmed: false,
     mapLat: 21.1702,
     mapLng: 72.8311,
@@ -754,13 +754,13 @@ export default function AdminPage() {
       streetAddress: prop.streetAddress || prop.location || `${matchedArea}, ${defaultCity}`,
       address: prop.location || `${matchedArea}, ${defaultCity}, Gujarat`,
       location: prop.location || `${matchedArea}, ${defaultCity}`,
-      society: prop.society || prop.name || "Shree Residency",
-      plotNo: prop.plotNo || "P-24",
+      society: prop.society || prop.name || "",
+      plotNo: prop.plotNo || "",
       surveyNo: prop.surveyNo || "",
-      wing: prop.wing || "A Wing",
-      floor: prop.floor || "5",
-      flatNo: prop.flatNo || "502",
-      villaNo: prop.villaNo || "Villa 12",
+      wing: prop.wing || "",
+      floor: prop.floor || "",
+      flatNo: prop.flatNo || "",
+      villaNo: prop.villaNo || "",
       pincode: (prop.pincode && prop.pincode !== "395007")
         ? prop.pincode
         : (getGujaratPincode(matchedArea, defaultCity) || prop.pincode || "395007"),
@@ -932,27 +932,61 @@ export default function AdminPage() {
     }
   };
 
-  // Photo file upload from device
+  // Photo file upload from device with client-side canvas optimization
   const handlePhotoFiles = (files) => {
     if (!files || files.length === 0) return;
     Array.from(files).forEach((file) => {
       if (!file.type.startsWith("image/")) return;
       const reader = new FileReader();
       reader.onload = (e) => {
-        const dataUrl = e.target.result;
-        setFormData((prev) => {
-          const existing = prev.galleryImages || [];
-          const nextGallery = [...existing, dataUrl];
-          return {
-            ...prev,
-            galleryImages: nextGallery,
-            image: prev.image || dataUrl,
-          };
-        });
+        const rawUrl = e.target.result;
+        // Resize & compress high-res images to prevent localStorage quota exhaustion
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 1600;
+          let width = img.width;
+          let height = img.height;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.82);
+
+          setFormData((prev) => {
+            const existing = prev.galleryImages || [];
+            const nextGallery = [...existing, compressedDataUrl];
+            return {
+              ...prev,
+              galleryImages: nextGallery,
+              image: prev.image || compressedDataUrl,
+            };
+          });
+        };
+        img.onerror = () => {
+          setFormData((prev) => {
+            const existing = prev.galleryImages || [];
+            return {
+              ...prev,
+              galleryImages: [...existing, rawUrl],
+              image: prev.image || rawUrl,
+            };
+          });
+        };
+        img.src = rawUrl;
       };
       reader.readAsDataURL(file);
     });
-    showToast("Photo(s) uploaded successfully!");
+    showToast("Photo(s) uploaded & optimized successfully!");
   };
 
   // Remove photo from gallery
@@ -1183,6 +1217,9 @@ export default function AdminPage() {
     try {
       await deleteProperty(prop.id);
       setProperties((prev) => prev.filter((item) => item.id !== prop.id));
+      if (selectedViewProperty && (selectedViewProperty.id === prop.id || String(selectedViewProperty.id) === String(prop.id))) {
+        setSelectedViewProperty(null);
+      }
       showToast(`Deleted "${prop.name}" from your portfolio`);
     } catch (err) {
       console.error("Delete failed:", err);
@@ -1296,7 +1333,10 @@ export default function AdminPage() {
       .sort((a, b) => {
         if (sortBy === "price-high") return Number(b.price) - Number(a.price);
         if (sortBy === "price-low") return Number(a.price) - Number(b.price);
-        return Number(b.id) - Number(a.id); // newest by default
+        const idA = Number(a.id);
+        const idB = Number(b.id);
+        if (!isNaN(idA) && !isNaN(idB)) return idB - idA;
+        return String(b.id || "").localeCompare(String(a.id || ""));
       });
   }, [properties, modeFilter, cityFilter, typeFilter, searchQuery, sortBy]);
 
@@ -1694,7 +1734,7 @@ export default function AdminPage() {
 
           <div className="admin-kpi-card">
             <div className="admin-kpi-icon-wrap success">
-              <DollarSign size={22} />
+              <IndianRupee size={22} />
             </div>
             <div className="admin-kpi-details">
               <span className="admin-kpi-label">Inventory Valuation</span>
@@ -3200,7 +3240,7 @@ export default function AdminPage() {
                     {/* Header badge showing current mode */}
                     <div className="admin-type-specific-header">
                       <span className="admin-type-header-title">
-                        <DollarSign size={16} style={{ color: "#15803d" }} />
+                        <IndianRupee size={16} style={{ color: "#15803d" }} />
                         {formData.mode === "buy" ? "For Sale: Purchase & Transaction Fee Breakdown" :
                           formData.mode === "rent" ? "Rental: Monthly Lease & Move-in Fee Structure" :
                             "Short-Term Stay: Nightly Tariff & Guest Fee Breakdown"}
