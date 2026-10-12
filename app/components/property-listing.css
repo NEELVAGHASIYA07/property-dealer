@@ -457,20 +457,7 @@
   width: 100%;
   aspect-ratio: 16 / 10;
   overflow: hidden;
-  /* Skeleton shimmer while image loads */
-  background: linear-gradient(
-    90deg,
-    #e2ded5 25%,
-    #ede9e1 50%,
-    #e2ded5 75%
-  );
-  background-size: 800px 100%;
-  animation: card-img-shimmer 1.4s ease-in-out infinite;
-}
-
-.property-card-image-wrap.img-loaded {
-  animation: none;
-  background: #e2ded5;
+  background: #ede9e1;
 }
 
 .property-card-image-link {
@@ -483,12 +470,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s ease, opacity 0.3s ease;
-  opacity: 0;
-}
-
-.property-card-img.img-visible {
-  opacity: 1;
+  display: block;
+  transition: transform 0.4s ease;
 }
 
 .property-card-item:hover .property-card-img {

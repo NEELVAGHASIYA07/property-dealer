@@ -30,35 +30,30 @@ export default function PropertyCard({
   const { requireAuth } = useAuth();
   const [isSaved, setIsSaved] = useState(false);
   const [currentImgIdx, setCurrentImgIdx] = useState(0);
-  const [imgLoaded, setImgLoaded] = useState(false);
 
   const images = getPropertyImages(property).slice(0, 5);
-  const activeImg = images[currentImgIdx] || property.image;
+  const activeImg = images[currentImgIdx] || property.image || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80";
 
-  // Reset carousel index & loaded state when the property changes (e.g. after filter)
+  // Reset carousel index when the property changes (e.g. after filter)
   useEffect(() => {
     setCurrentImgIdx(0);
-    setImgLoaded(false);
   }, [property.id]);
 
   const handlePrevImage = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    setImgLoaded(false);
     setCurrentImgIdx((prev) => (prev - 1 + images.length) % images.length);
   };
 
   const handleNextImage = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    setImgLoaded(false);
     setCurrentImgIdx((prev) => (prev + 1) % images.length);
   };
 
   const handleDotClick = (e, idx) => {
     e.stopPropagation();
     e.preventDefault();
-    setImgLoaded(false);
     setCurrentImgIdx(idx);
   };
 
@@ -137,7 +132,7 @@ export default function PropertyCard({
       onClick={handleCardClick}
     >
       {/* Property Image & Badges */}
-      <div className={`property-card-image-wrap${imgLoaded ? " img-loaded" : ""}`}>
+      <div className="property-card-image-wrap">
         <Link
           href={propertyUrl}
           target="_blank"
@@ -148,9 +143,11 @@ export default function PropertyCard({
           <img
             src={activeImg}
             alt={`${property.name} - Photo ${currentImgIdx + 1}`}
-            className={`property-card-img${imgLoaded ? " img-visible" : ""}`}
+            className="property-card-img"
             loading="lazy"
-            onLoad={() => setImgLoaded(true)}
+            onError={(e) => {
+              e.currentTarget.src = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80";
+            }}
           />
         </Link>
 
