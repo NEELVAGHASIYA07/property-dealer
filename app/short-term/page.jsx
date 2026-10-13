@@ -1,4 +1,4 @@
-import PropertyListing from "@/app/components/PropertyListing";
+import PropertyListing from "@/components/PropertyListing";
 
 export const metadata = {
   title: "Short-term Stays in Gujarat | Luxury Holiday Homes & Penthouses",

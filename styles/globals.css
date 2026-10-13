@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
-@import "./components/soft-sand-select.css";
+@import "./soft-sand-select.css";
 
 :root {
   --background: #f4f1eb;

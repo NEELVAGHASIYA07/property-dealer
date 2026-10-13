@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { loginUser, signupUser } from "@/app/lib/api";
+import { loginUser, signupUser } from "@/lib/api";
 import {
   User,
   Mail,

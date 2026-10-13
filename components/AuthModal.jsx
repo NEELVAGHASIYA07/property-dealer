@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/app/context/AuthContext";
-import { loginUser, signupUser } from "@/app/lib/api";
+import { useAuth } from "@/context/AuthContext";
+import { loginUser, signupUser } from "@/lib/api";
 import {
   X,
   Lock,
@@ -18,7 +18,7 @@ import {
   ShieldCheck,
   ArrowRight,
 } from "lucide-react";
-import "./auth-modal.css";
+import "@/styles/auth-modal.css";
 
 export default function AuthModal() {
   const router = useRouter();

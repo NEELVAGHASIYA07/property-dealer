@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import Navbar from "./components/Navbar";
+import "@/styles/globals.css";
+import Navbar from "@/components/Navbar";
 import Providers from "./providers";
 
 const geistSans = Geist({

@@ -28,10 +28,10 @@ import {
   getGoogleMapsPinUrl,
   getGoogleMapsEmbedUrl,
   getGujaratPincode,
-} from "@/app/lib/geocoding";
-import { getDealerForProperty, VERIFIED_DEALERS } from "@/app/lib/dealers";
-import { FALLBACK_PROPERTIES } from "@/app/lib/propertiesData";
-import "./PropertyDetailsDrawer.css";
+} from "@/lib/geocoding";
+import { getDealerForProperty, VERIFIED_DEALERS } from "@/lib/dealers";
+import { FALLBACK_PROPERTIES } from "@/lib/propertiesData";
+import "@/styles/PropertyDetailsDrawer.css";
 
 function formatCurrency(val) {
   if (!val) return "₹0";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { GUJARAT_CITY_COORDS } from "@/app/lib/geocoding";
+import { GUJARAT_CITY_COORDS } from "@/lib/geocoding";
 import { RotateCcw, Layers, MapPin, Plus, Minus } from "lucide-react";
 
 const MAP_LAYERS = {

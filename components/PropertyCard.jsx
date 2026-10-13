@@ -16,9 +16,9 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { isPropertySaved, toggleSaveProperty } from "@/app/lib/savedHomes";
-import { getPropertyImages } from "@/app/lib/propertiesData";
-import { useAuth } from "@/app/context/AuthContext";
+import { isPropertySaved, toggleSaveProperty } from "@/lib/savedHomes";
+import { getPropertyImages } from "@/lib/propertiesData";
+import { useAuth } from "@/context/AuthContext";
 
 export default function PropertyCard({
   property,

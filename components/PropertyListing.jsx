@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useMemo, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import PropertyCard from "@/app/components/PropertyCard";
-import PropertyMap from "@/app/components/PropertyMap";
-import SoftSandSelect from "@/app/components/SoftSandSelect";
-import { fetchEnrichedProperties } from "@/app/lib/propertiesData";
+import PropertyCard from "@/components/PropertyCard";
+import PropertyMap from "@/components/PropertyMap";
+import SoftSandSelect from "@/components/SoftSandSelect";
+import { fetchEnrichedProperties } from "@/lib/propertiesData";
 import {
   Search,
   ChevronDown,
@@ -17,34 +17,12 @@ import {
   Sparkles,
   Building,
 } from "lucide-react";
-import "./property-listing.css";
+import "@/styles/property-listing.css";
 
-const GUJARAT_CITIES = [
-  "Surat",
-  "Ahmedabad",
-  "Vadodara",
-  "Rajkot",
-  "Gandhinagar",
-  "Bhavnagar",
-  "Jamnagar",
-  "Junagadh",
-  "Anand",
-  "Nadiad",
-  "Bharuch",
-  "Vapi",
-  "Mehsana",
-  "Morbi",
-  "Bhuj",
-  "Navsari",
-];
-
-const GUJARAT_CITY_AREAS = {
-  Surat: ["Vesu", "Adajan", "Pal", "Katargam", "Varachha", "Althan", "Piplod", "City Light", "Singanpor", "Amroli", "Mota Varachha", "Dumas Road", "Nanpura"],
-  Ahmedabad: ["Bodakdev", "Sindhu Bhavan Road", "Prahlad Nagar", "SG Highway", "Satellite", "Ambli", "Vastrapur", "Thaltej", "Bopal", "Science City", "Navrangpura", "Gota"],
-  Vadodara: ["Alkapuri", "Vasna-Bhayli", "Gotri", "Sayajigunj", "Karelibaug", "Akota", "Old Padra Road", "Manjalpur"],
-  Rajkot: ["Kalawad Road", "Yagnik Road", "University Road", "Nana Mava", "150 Feet Ring Road", "Raiya Road", "Amin Marg"],
-  Gandhinagar: ["Kudasan", "GIFT City Road", "Infocity", "Raysan", "Sargasan", "Sector 8", "Sector 21", "Vavol"],
-};
+import {
+  GUJARAT_CITY_NAMES as GUJARAT_CITIES,
+  GUJARAT_CITY_AREAS,
+} from "@/constants";
 
 const MODE_PROPERTY_TYPES = {
   buy: [
@@ -205,28 +183,118 @@ function PropertyListingContent({ mode = "buy" }) {
   const [selectedPropertyId, setSelectedPropertyId] = useState(null);
   const [showMap, setShowMap] = useState(true); // Default ON
   const [mobileView, setMobileView] = useState("list"); // 'list' | 'map'
+  const [isRestored, setIsRestored] = useState(false);
 
   // Active type options depending on page mode (buy, rent, short-term)
   const activeTypeOptions = useMemo(() => {
     return MODE_PROPERTY_TYPES[mode] || MODE_PROPERTY_TYPES.buy;
   }, [mode]);
 
-  // Pre-fill from URL query params (e.g. from homepage search widget)
+  // Restore filter state from storage or URL search params on mount
   useEffect(() => {
+    const storageKey = `fieldhouse_listing_filters_${mode}`;
+    let saved = {};
+    if (typeof window !== "undefined") {
+      try {
+        const raw = sessionStorage.getItem(storageKey) || localStorage.getItem(storageKey);
+        if (raw) saved = JSON.parse(raw) || {};
+      } catch (e) {}
+    }
+
+    const qSearch = searchParams.get("search") || searchParams.get("q");
     const qCity = searchParams.get("city");
-    const qBedrooms = searchParams.get("bedrooms");
+    const qArea = searchParams.get("area");
+    const qBedrooms = searchParams.get("bedrooms") || searchParams.get("bhk");
+    const qPriceRange = searchParams.get("priceRange");
     const qPriceMin = searchParams.get("priceMin");
     const qPriceMax = searchParams.get("priceMax");
     const qType = searchParams.get("type");
+    const qSort = searchParams.get("sort") || searchParams.get("sortBy");
+    const qShowMap = searchParams.get("showMap");
+    const qView = searchParams.get("view");
 
-    if (qCity) setSelectedCity(qCity);
-    if (qBedrooms) setSelectedBhk(qBedrooms);
-    if (qType) setSelectedType(qType);
-    if (qPriceMin || qPriceMax) {
-      if (qPriceMin && !qPriceMax) setSelectedPriceRange(`${qPriceMin}+`);
-      else if (qPriceMin && qPriceMax) setSelectedPriceRange(`${qPriceMin}-${qPriceMax}`);
+    // Values: URL param takes precedence, then saved storage, then defaults
+    const initialSearch = qSearch !== null ? qSearch : (saved.searchQuery || "");
+    const initialCity = qCity !== null ? qCity : (saved.selectedCity || "");
+    const initialArea = qArea !== null ? qArea : (saved.selectedArea || "");
+    const initialBhk = qBedrooms !== null ? qBedrooms : (saved.selectedBhk || "");
+
+    let initialPrice = saved.selectedPriceRange || "";
+    if (qPriceRange) {
+      initialPrice = qPriceRange;
+    } else if (qPriceMin || qPriceMax) {
+      if (qPriceMin && !qPriceMax) initialPrice = `${qPriceMin}+`;
+      else if (qPriceMin && qPriceMax) initialPrice = `${qPriceMin}-${qPriceMax}`;
     }
-  }, [searchParams]);
+
+    const initialType = qType !== null ? qType : (saved.selectedType || "All");
+    const initialSort = qSort !== null ? qSort : (saved.sortBy || "Popularity");
+    const initialShowMap = qShowMap !== null ? qShowMap !== "false" : (saved.showMap !== undefined ? saved.showMap : true);
+    const initialMobileView = qView !== null ? qView : (saved.mobileView || "list");
+
+    if (initialSearch !== undefined) setSearchQuery(initialSearch);
+    if (initialCity !== undefined) setSelectedCity(initialCity);
+    if (initialArea !== undefined) setSelectedArea(initialArea);
+    if (initialBhk !== undefined) setSelectedBhk(initialBhk);
+    if (initialPrice !== undefined) setSelectedPriceRange(initialPrice);
+    if (initialType !== undefined) setSelectedType(initialType);
+    if (initialSort !== undefined) setSortBy(initialSort);
+    if (initialShowMap !== undefined) setShowMap(initialShowMap);
+    if (initialMobileView !== undefined) setMobileView(initialMobileView);
+
+    setIsRestored(true);
+  }, [mode, searchParams]);
+
+  // Synchronize state with sessionStorage, localStorage, and URL query params so refresh never loses data
+  useEffect(() => {
+    if (!isRestored || typeof window === "undefined") return;
+
+    const storageKey = `fieldhouse_listing_filters_${mode}`;
+    const stateToSave = {
+      searchQuery,
+      selectedCity,
+      selectedArea,
+      selectedBhk,
+      selectedPriceRange,
+      selectedType,
+      sortBy,
+      showMap,
+      mobileView,
+    };
+
+    try {
+      sessionStorage.setItem(storageKey, JSON.stringify(stateToSave));
+      localStorage.setItem(storageKey, JSON.stringify(stateToSave));
+    } catch (e) {}
+
+    // Update URL query string with replaceState so refresh retains identical parameters
+    const params = new URLSearchParams();
+    if (searchQuery.trim()) params.set("search", searchQuery.trim());
+    if (selectedCity) params.set("city", selectedCity);
+    if (selectedArea) params.set("area", selectedArea);
+    if (selectedBhk) params.set("bedrooms", selectedBhk);
+    if (selectedPriceRange) params.set("priceRange", selectedPriceRange);
+    if (selectedType && selectedType !== "All") params.set("type", selectedType);
+    if (sortBy && sortBy !== "Popularity") params.set("sort", sortBy);
+    if (!showMap) params.set("showMap", "false");
+    if (mobileView && mobileView !== "list") params.set("view", mobileView);
+
+    const qs = params.toString();
+    const newUrl = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
+    window.history.replaceState(null, "", newUrl);
+  }, [
+    isRestored,
+    mode,
+    searchQuery,
+    selectedCity,
+    selectedArea,
+    selectedBhk,
+    selectedPriceRange,
+    selectedType,
+    sortBy,
+    showMap,
+    mobileView,
+  ]);
 
   // Load properties and ensure window is at top
   useEffect(() => {
@@ -429,6 +497,14 @@ function PropertyListingContent({ mode = "buy" }) {
 
   // Reset all filters
   const handleResetFilters = () => {
+    const storageKey = `fieldhouse_listing_filters_${mode}`;
+    if (typeof window !== "undefined") {
+      try {
+        sessionStorage.removeItem(storageKey);
+        localStorage.removeItem(storageKey);
+        window.history.replaceState(null, "", window.location.pathname);
+      } catch (e) {}
+    }
     setSearchQuery("");
     setSelectedCity("");
     setSelectedArea("");

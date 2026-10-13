@@ -10,7 +10,7 @@ import {
   getDirectGoogleMapsOpenUrl,
   getGoogleMapsEmbedUrl,
   getGujaratPincode,
-} from "@/app/lib/geocoding";
+} from "@/lib/geocoding";
 import {
   MapPin,
   Search,

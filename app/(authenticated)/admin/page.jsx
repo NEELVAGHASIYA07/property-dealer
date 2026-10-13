@@ -10,11 +10,11 @@ import {
   deleteProperty,
   loginUser,
   getCities,
-} from "@/app/lib/api";
-import InteractiveMapPicker from "@/app/components/InteractiveMapPicker";
-import PropertyDetailsDrawer from "./components/PropertyDetailsDrawer";
-import SoftSandSelect from "@/app/components/SoftSandSelect";
-import { FALLBACK_PROPERTIES } from "@/app/lib/propertiesData";
+} from "@/lib/api";
+import InteractiveMapPicker from "@/components/InteractiveMapPicker";
+import PropertyDetailsDrawer from "@/components/admin/PropertyDetailsDrawer";
+import SoftSandSelect from "@/components/SoftSandSelect";
+import { FALLBACK_PROPERTIES } from "@/lib/propertiesData";
 import {
   searchLocation,
   reverseGeocode,
@@ -26,8 +26,8 @@ import {
   getGujaratAreaForPincode,
   GUJARAT_PINCODE_AREAS,
   GUJARAT_AREA_PINCODES,
-} from "@/app/lib/geocoding";
-import "./admin.css";
+} from "@/lib/geocoding";
+import "@/styles/admin.css";
 
 import {
   Building2,
@@ -592,9 +592,47 @@ export default function AdminPage() {
       const urlTab = params.get("tab");
       if (urlTab && ["properties", "leads", "analytics"].includes(urlTab)) {
         setActiveTab(urlTab);
+      } else {
+        const savedTab = sessionStorage.getItem("fieldhouse_admin_active_tab");
+        if (savedTab && ["properties", "leads", "analytics"].includes(savedTab)) {
+          setActiveTab(savedTab);
+        }
       }
+
+      try {
+        const savedFilters = sessionStorage.getItem("fieldhouse_admin_filters");
+        if (savedFilters) {
+          const parsed = JSON.parse(savedFilters);
+          if (parsed.modeFilter) setModeFilter(parsed.modeFilter);
+          if (parsed.searchQuery) setSearchQuery(parsed.searchQuery);
+          if (parsed.cityFilter) setCityFilter(parsed.cityFilter);
+          if (parsed.typeFilter) setTypeFilter(parsed.typeFilter);
+          if (parsed.sortBy) setSortBy(parsed.sortBy);
+          if (parsed.viewMode) setViewMode(parsed.viewMode);
+        }
+      } catch (e) {}
     }
   }, []);
+
+  // Persist admin active tab and filter state on change so refresh never resets them
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        sessionStorage.setItem("fieldhouse_admin_active_tab", activeTab);
+        sessionStorage.setItem(
+          "fieldhouse_admin_filters",
+          JSON.stringify({
+            modeFilter,
+            searchQuery,
+            cityFilter,
+            typeFilter,
+            sortBy,
+            viewMode,
+          })
+        );
+      } catch (e) {}
+    }
+  }, [activeTab, modeFilter, searchQuery, cityFilter, typeFilter, sortBy, viewMode]);
 
   useEffect(() => {
     document.body.classList.add("admin-no-nav");

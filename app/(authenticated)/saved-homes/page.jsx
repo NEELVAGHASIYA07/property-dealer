@@ -16,9 +16,9 @@ import {
   getSavedPropertiesList,
   fetchSavedPropertiesList,
   toggleSaveProperty,
-} from "@/app/lib/savedHomes";
-import { useAuth } from "@/app/context/AuthContext";
-import "@/app/profile/profile.css";
+} from "@/lib/savedHomes";
+import { useAuth } from "@/context/AuthContext";
+import "@/styles/profile.css";
 
 export default function SavedHomesPage() {
   const { user, openAuthModal } = useAuth();

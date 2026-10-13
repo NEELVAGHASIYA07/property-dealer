@@ -23,7 +23,7 @@ import {
   Sparkles,
   BookOpen,
 } from "lucide-react";
-import { useAuth } from "@/app/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 
 const syncUserCookie = (u) => {
   if (typeof document !== "undefined") {

@@ -21,19 +21,11 @@ import {
   KeyRound,
   ShieldAlert,
 } from "lucide-react";
-import "./profile.css";
-import SoftSandSelect from "@/app/components/SoftSandSelect";
-import { useAuth } from "@/app/context/AuthContext";
+import "@/styles/profile.css";
+import SoftSandSelect from "@/components/SoftSandSelect";
+import { useAuth } from "@/context/AuthContext";
 
-const GUJARAT_CITIES = [
-  "Surat",
-  "Ahmedabad",
-  "Vadodara",
-  "Rajkot",
-  "Gandhinagar",
-  "Bhavnagar",
-  "Anand",
-];
+import { GUJARAT_CITY_NAMES as GUJARAT_CITIES } from "@/constants";
 
 export default function ProfilePage() {
   const router = useRouter();

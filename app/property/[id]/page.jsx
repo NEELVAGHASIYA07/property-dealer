@@ -3,10 +3,10 @@
 import { useEffect, useState, use, useRef } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { fetchPropertyById, getPropertyImages } from "@/app/lib/propertiesData";
-import { getGoogleMapsUrl } from "@/app/lib/geocoding";
-import { isPropertySaved, toggleSaveProperty } from "@/app/lib/savedHomes";
-import { useAuth } from "@/app/context/AuthContext";
+import { fetchPropertyById, getPropertyImages } from "@/lib/propertiesData";
+import { getGoogleMapsUrl } from "@/lib/geocoding";
+import { isPropertySaved, toggleSaveProperty } from "@/lib/savedHomes";
+import { useAuth } from "@/context/AuthContext";
 import {
   MapPin,
   Bed,
@@ -33,7 +33,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import "./property-detail.css";
+import "@/styles/property-detail.css";
 
 export default function PropertyDetailPage({ params }) {
   // Unwrap params using React.use() if Promise, or useParams hook

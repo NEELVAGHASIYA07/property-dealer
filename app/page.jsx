@@ -3,106 +3,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Search, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, MapPin, Flame } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-import SoftSandSelect from "@/app/components/SoftSandSelect";
-import { getTrendingProperties, getCities } from "@/app/lib/api";
-import { FALLBACK_PROPERTIES } from "@/app/lib/propertiesData";
+import SoftSandSelect from "@/components/SoftSandSelect";
+import { getTrendingProperties, getCities } from "@/lib/api";
+import { FALLBACK_PROPERTIES } from "@/lib/propertiesData";
 
-const cities = [
-	"Ahmedabad", "Surat", "Vadodara", "Rajkot", "Gandhinagar",
-	"Bhavnagar", "Jamnagar", "Junagadh", "Anand", "Nadiad",
-	"Bharuch", "Vapi", "Mehsana", "Morbi", "Bhuj", "Porbandar", "Navsari", "Palanpur"
-];
-
-const PRICE_OPTIONS = {
-	rent: [
-		{ label: "All price", value: "" },
-		{ label: "Under INR 20,000 / mo", value: "0-20000" },
-		{ label: "INR 20,000 – 40,000 / mo", value: "20000-40000" },
-		{ label: "INR 40,000 – 60,000 / mo", value: "40000-60000" },
-		{ label: "INR 60,000 – 80,000 / mo", value: "60000-80000" },
-		{ label: "Above INR 80,000 / mo", value: "80000+" },
-	],
-	buy: [
-		{ label: "All price", value: "" },
-		{ label: "Under INR 50 L", value: "0-5000000" },
-		{ label: "INR 50 L – 1 Cr", value: "5000000-10000000" },
-		{ label: "INR 1 Cr – 2 Cr", value: "10000000-20000000" },
-		{ label: "INR 2 Cr – 3 Cr", value: "20000000-30000000" },
-		{ label: "Above INR 3 Cr", value: "30000000+" },
-	],
-	"short-term": [
-		{ label: "All price", value: "" },
-		{ label: "Under INR 2,000 / night", value: "0-2000" },
-		{ label: "INR 2,000 – 3,000 / night", value: "2000-3000" },
-		{ label: "INR 3,000 – 4,000 / night", value: "3000-4000" },
-		{ label: "INR 4,000 – 5,000 / night", value: "4000-5000" },
-		{ label: "Above INR 5,000 / night", value: "5000+" },
-	],
-};
-
-
-const GUJARAT_CITIES = [
-	{
-		name: "Ahmedabad",
-		properties: 488,
-		image: "/images/cities/ahmedabad.jpg"
-	},
-	{
-		name: "Surat",
-		properties: 398,
-		image: "/images/cities/surat.jpg"
-	},
-	{
-		name: "Vadodara",
-		properties: 468,
-		image: "/images/cities/vadodara.jpg"
-	},
-	{
-		name: "Rajkot",
-		properties: 336,
-		image: "/images/cities/rajkot.jpg"
-	},
-	{
-		name: "Gandhinagar",
-		properties: 481,
-		image: "/images/cities/gandhinagar.jpg"
-	},
-	{
-		name: "Bhavnagar",
-		properties: 218,
-		image: "/images/cities/bhavnagar.jpg"
-	},
-	{
-		name: "Jamnagar",
-		properties: 185,
-		image: "/images/cities/jamnagar.jpg"
-	},
-	{
-		name: "Junagadh",
-		properties: 160,
-		image: "/images/cities/junagadh.jpg"
-	},
-	{
-		name: "Anand",
-		properties: 195,
-		image: "/images/cities/anand.jpg"
-	},
-	{
-		name: "Navsari",
-		properties: 145,
-		image: "/images/cities/navsari.jpg"
-	},
-	{
-		name: "Bharuch",
-		properties: 170,
-		image: "/images/cities/bharuch.jpg"
-	},
-	{
-		name: "Vapi",
-		properties: 210,
-		image: "/images/cities/vapi.jpg"
-	}
-];
+import {
+	GUJARAT_CITY_NAMES as cities,
+	PRICE_OPTIONS,
+	GUJARAT_FEATURED_CITIES as GUJARAT_CITIES,
+} from "@/constants";
 
 export default function HomePage() {
 	const router = useRouter();
